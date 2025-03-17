@@ -119,7 +119,11 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 
 		@RequirePOST
 		public FormValidation doCheckCredentialsId(@QueryParameter final String credentialsId) {
-			return checkRequired(credentialsId);
+			if (credentialsId == null || credentialsId.isBlank()) {
+				return FormValidation.error(Messages.IBMiServer_credentials_required());
+			} else {
+				return FormValidation.ok();
+			}
 		}
 
 		@RequirePOST
@@ -137,14 +141,6 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 				}
 			}
 			return FormValidation.ok();
-		}
-
-		private FormValidation checkRequired(final String value) {
-			if (value == null || value.isBlank()) {
-				return FormValidation.error(Messages.required());
-			} else {
-				return FormValidation.ok();
-			}
 		}
 
 		@RequirePOST
