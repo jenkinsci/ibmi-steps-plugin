@@ -3,11 +3,7 @@
     <f:section title="${%IBMIServers}" description="${%IBMIServersDescription}">
         <f:entry field="servers">
             <f:repeatableProperty add="${%AddIBMi}" field="servers">
-                <f:block>
-                    <div align="right">
-                        <f:repeatableDeleteButton/>
-                    </div>
-                </f:block>
+                <f:repeatableDeleteButton/>
             </f:repeatableProperty>
         </f:entry>
     </f:section>
