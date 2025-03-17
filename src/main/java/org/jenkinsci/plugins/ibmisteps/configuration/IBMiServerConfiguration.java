@@ -117,6 +117,7 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 		}
 
 		@RequirePOST
+		@SuppressWarnings("lgtm[jenkins/no-permission-check]")
 		public FormValidation doCheckCredentialsId(@QueryParameter final String credentialsId) {
 			if (credentialsId == null || credentialsId.isBlank()) {
 				return FormValidation.error(Messages.IBMiServer_credentials_required());
@@ -126,6 +127,7 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 		}
 
 		@RequirePOST
+		@SuppressWarnings("lgtm[jenkins/no-permission-check]")
 		public FormValidation doCheckCcsid(@QueryParameter final String ccsid) {
 			if (ccsid != null && !ccsid.isBlank()) {
 				try {
@@ -148,6 +150,8 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 				@QueryParameter(required = false) final String ccsid,
 				@QueryParameter(required = false) final boolean secure,
 				@AncestorInPath final Item item) {
+			Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+
 			final StandardUsernamePasswordCredentials credentials = CredentialsMatchers.firstOrNull(
 					CredentialsProvider.lookupCredentialsInItem(
 							StandardUsernamePasswordCredentials.class,
