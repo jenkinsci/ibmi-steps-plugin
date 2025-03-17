@@ -48,7 +48,8 @@
 
 	<properties>
 		<gitHubRepo>jenkinsci/ibmi-steps-plugin</gitHubRepo>
-		<jenkins.version>2.479.3</jenkins.version>
+		<jenkins.baseline>2.479</jenkins.baseline>
+		<jenkins.version>${jenkins.baseline}.1</jenkins.version>
 		<spotless.check.skip>true</spotless.check.skip>
 	</properties>
 
@@ -56,10 +57,15 @@
 		<dependencies>
 			<dependency>
 				<groupId>io.jenkins.tools.bom</groupId>
-				<artifactId>bom-2.479.x</artifactId>
-				<version>4440.v39a_9eb_b_c6b_4d</version>
+				<artifactId>bom-${jenkins.baseline}.x</artifactId>
+				<version>4136.vca_c3202a_7fd1</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jenkins-ci.plugins</groupId>
+				<artifactId>jackson2-api</artifactId>
+				<version>2.18.3-402.v74c4eb_f122b_2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -80,11 +86,6 @@
 		<dependency>
 			<groupId>org.jenkins-ci.plugins</groupId>
 			<artifactId>jackson2-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.siegmar</groupId>
-			<artifactId>fastcsv</artifactId>
-			<version>3.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jenkins-ci.plugins.workflow</groupId>
