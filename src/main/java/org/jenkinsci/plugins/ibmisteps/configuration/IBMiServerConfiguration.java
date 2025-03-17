@@ -118,16 +118,6 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 		}
 
 		@RequirePOST
-		public FormValidation doCheckName(@QueryParameter final String name) {
-			return checkRequired(name);
-		}
-
-		@RequirePOST
-		public FormValidation doCheckHost(@QueryParameter final String host) {
-			return checkRequired(host);
-		}
-
-		@RequirePOST
 		public FormValidation doCheckCredentialsId(@QueryParameter final String credentialsId) {
 			return checkRequired(credentialsId);
 		}
