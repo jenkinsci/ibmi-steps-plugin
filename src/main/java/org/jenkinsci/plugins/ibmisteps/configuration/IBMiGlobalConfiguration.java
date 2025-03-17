@@ -49,12 +49,13 @@ public class IBMiGlobalConfiguration extends GlobalConfiguration {
 
 	@Override
 	public boolean configure(final StaplerRequest2 req, final JSONObject json) throws FormException {
+		final boolean configured = super.configure(req, json);
 		for (final IBMiServerConfiguration server : servers) {
 			if (servers.stream().anyMatch(s -> s != server && s.getName().equals(server.getName()))
 					&& LOGGER.isLoggable(Level.WARNING)) {
 				LOGGER.warning(Messages.IBMiGlobalConfiguration_duplicated_servers(server.getName()));
 			}
 		}
-		return super.configure(req, json);
+		return configured;
 	}
 }
