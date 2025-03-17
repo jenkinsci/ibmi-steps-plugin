@@ -102,6 +102,7 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 
 	@Extension
 	public static class DescriptorImpl extends Descriptor<IBMiServerConfiguration> {
+		@RequirePOST
 		public final ListBoxModel doFillCredentialsIdItems(@QueryParameter final String value) {
 			if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
 				return new StandardUsernameListBoxModel().includeCurrentValue(value);
