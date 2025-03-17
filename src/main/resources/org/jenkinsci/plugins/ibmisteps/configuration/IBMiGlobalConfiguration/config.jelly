@@ -1,0 +1,14 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:section title="${%IBMIServers}" description="${%IBMIServersDescription}">
+        <f:entry field="servers">
+            <f:repeatableProperty add="${%AddIBMi}" field="servers">
+                <f:block>
+                    <div align="right">
+                        <f:repeatableDeleteButton/>
+                    </div>
+                </f:block>
+            </f:repeatableProperty>
+        </f:entry>
+    </f:section>
+</j:jelly>

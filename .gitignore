@@ -1,0 +1,8 @@
+target
+# mvn hpi:run
+work
+
+.*
+!.gitignore
+!.mvn
+!.github

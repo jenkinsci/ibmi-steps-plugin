@@ -1,0 +1,28 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+    <f:entry field="name" title="${%Name}">
+        <f:textbox/>
+    </f:entry>
+
+    <f:entry field="host" title="${%Host}">
+        <f:textbox/>
+    </f:entry>
+
+    <f:entry field="credentialsId" title="${%Credentials}">
+        <c:select includeUser="false"/>
+    </f:entry>
+
+    <f:advanced>
+        <f:entry field="ccsid" title="${%CCSID}" description="${%CCSIDDescription}">
+            <f:textbox/>
+        </f:entry>
+
+        <f:entry field="secure" title="${%Secure}">
+            <f:checkbox default="false"/>
+        </f:entry>
+    </f:advanced>
+
+    <f:validateButton title="${%TestConnection}"
+                      progress="${%Connecting}..." method="testConnection"
+                      with="host,credentialsId,ccsid,secure"/>
+</j:jelly>

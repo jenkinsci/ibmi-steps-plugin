@@ -1,0 +1,20 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<org.jenkinsci.plugins.ibmisteps.configuration.IBMiGlobalConfiguration plugin="ibmi-steps@0.0.1-SNAPSHOT">
+    <servers>
+        <org.jenkinsci.plugins.ibmisteps.configuration.IBMiServerConfiguration>
+            <name>IBMi 1</name>
+            <host>ibmi1.sebjulliand.github.com</host>
+            <credentialsId>a6d5ecee-c167-4ec5-8b5e-ee39ddb5c96e</credentialsId>
+            <ccsid></ccsid>
+            <secure>true</secure>
+        </org.jenkinsci.plugins.ibmisteps.configuration.IBMiServerConfiguration>
+
+        <org.jenkinsci.plugins.ibmisteps.configuration.IBMiServerConfiguration>
+            <name>IBMi 2</name>
+            <host>ibmi2.sebjulliand.github.com</host>
+            <credentialsId>hello-world</credentialsId>
+            <ccsid>37</ccsid>
+            <secure>false</secure>
+        </org.jenkinsci.plugins.ibmisteps.configuration.IBMiServerConfiguration>
+    </servers>
+</org.jenkinsci.plugins.ibmisteps.configuration.IBMiGlobalConfiguration>

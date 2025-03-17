@@ -1,0 +1,5 @@
+<?jelly escape-by-default='true'?>
+<div>
+    A plugin providing IBM i oriented pipeline steps such as command execution, Db2 queries execution or Save Files
+    transfer.
+</div>
