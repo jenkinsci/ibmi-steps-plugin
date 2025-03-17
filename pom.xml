@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>4.88</version>
+		<version>5.9</version>
 		<relativePath />
 	</parent>
 
@@ -48,7 +48,7 @@
 
 	<properties>
 		<gitHubRepo>jenkinsci/ibmi-steps-plugin</gitHubRepo>
-		<jenkins.version>2.462.3</jenkins.version>
+		<jenkins.version>2.479.3</jenkins.version>
 		<spotless.check.skip>true</spotless.check.skip>
 	</properties>
 
@@ -56,8 +56,8 @@
 		<dependencies>
 			<dependency>
 				<groupId>io.jenkins.tools.bom</groupId>
-				<artifactId>bom-2.462.x</artifactId>
-				<version>4228.v0a_71308d905b_</version>
+				<artifactId>bom-2.479.x</artifactId>
+				<version>4440.v39a_9eb_b_c6b_4d</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
