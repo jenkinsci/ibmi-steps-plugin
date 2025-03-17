@@ -85,8 +85,7 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 
 	@Override
 	public boolean equals(final Object other) {
-		if (other instanceof IBMiServerConfiguration) {
-			final IBMiServerConfiguration otherServer = (IBMiServerConfiguration) other;
+		if (other instanceof final IBMiServerConfiguration otherServer) {
 			return name.equals(otherServer.name) &&
 					host.equals(otherServer.host) &&
 					credentialsId.equals(otherServer.credentialsId) &&
