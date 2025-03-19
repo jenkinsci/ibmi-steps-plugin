@@ -13,7 +13,7 @@
 
 	<groupId>io.jenkins.plugins</groupId>
 	<artifactId>ibmi-steps</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${changelist}</version>
 	<packaging>hpi</packaging>
 
 	<name>IBM i Pipeline Steps</name>
@@ -47,6 +47,7 @@
 	</scm>
 
 	<properties>
+		<changelist>999999-SNAPSHOT</changelist>
 		<gitHubRepo>jenkinsci/ibmi-steps-plugin</gitHubRepo>
 		<jenkins.baseline>2.479</jenkins.baseline>
 		<jenkins.version>${jenkins.baseline}.1</jenkins.version>
