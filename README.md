@@ -28,6 +28,7 @@ IFS transfers.
     - [SpooledFile](#spooledfile)
 - [Examples](#examples)
     - [Save a library, download the Save File and archive its content description](#save-a-library-download-the-save-file-and-archive-its-content-description)
+    - [Transfer a libray from one LPAR to another](#transfer-a-libray-from-one-lpar-to-another)
 
 ## Configuration
 
@@ -412,20 +413,21 @@ node {
 ```
 
 ### Transfer a libray from one LPAR to another
+
 ```groovy
 node {
     stage('Save') {
         onIBMi(server: 'IBMI_1', traceEnabled: true) {
             ibmiCommand "CRTSAVF QTEMP/BACKUP"
             ibmiCommand "SAVLIB LIB(ECTO1) DEV(*SAVF) SAVF(QTEMP/BACKUP)"
-			ibmiGetSAVF library: "QTEMP", name: "BACKUP", toFile: "ecto1.savf"
+            ibmiGetSAVF library: "QTEMP", name: "BACKUP", toFile: "ecto1.savf"
         }
     }
-    
+
     stage('Restore') {
         onIBMi(server: 'IBMI_2', traceEnabled: true) {
             def content = ibmiPutSAVF(fromFile: "ecto1.savf", library: "QTEMP", name: "BACKUP")
-			ibmiCommand "RSTLIB SAVLIB(${content.savedLibrary}) DEV(*SAVF) SAVF(QTEMP/BACKUP)"
+            ibmiCommand "RSTLIB SAVLIB(${content.savedLibrary}) DEV(*SAVF) SAVF(QTEMP/BACKUP)"
         }
     }
 }
