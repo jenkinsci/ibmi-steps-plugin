@@ -1,37 +1,34 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
 import java.io.PrintStream;
+import java.util.Objects;
 
 public class LoggerWrapper {
     private final PrintStream logger;
     private final boolean doTrace;
 
     public LoggerWrapper(final PrintStream logger, final boolean doTrace) {
-        this.logger = logger;
+        this.logger = Objects.requireNonNull(logger, "Logger cannot be null");
         this.doTrace = doTrace;
     }
 
-    public void log(final String format, final Object... args) {
-        logger.format(format, args);
-        logger.println();
+    public synchronized void log(final String format, final Object... args) {
+        logger.println("[INFO] " + String.format(format, args));
     }
 
-    public void log(final String message) {
-        logger.println(message);
+    public synchronized void log(final String message) {
+        logger.println("[INFO] " + message);
     }
 
-    public void trace(final String format, final Object... args) {
+    public synchronized void trace(final String format, final Object... args) {
         if (doTrace) {
-            logger.print("[TRACE] ");
-            logger.format(format, args);
-            logger.println();
+            logger.println("[TRACE] " + String.format(format, args));
         }
     }
 
-    public void trace(final String message) {
+    public synchronized void trace(final String message) {
         if (doTrace) {
-            logger.print("[TRACE] ");
-            logger.println(message);
+            logger.println("[TRACE] " + message);
         }
     }
 }
