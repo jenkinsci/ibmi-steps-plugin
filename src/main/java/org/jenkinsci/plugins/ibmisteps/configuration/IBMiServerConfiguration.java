@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.ibmisteps.configuration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -161,8 +162,8 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 					CredentialsMatchers.withId(credentialsId));
 			final IBMiServerConfiguration config = new IBMiServerConfiguration("", host, credentialsId, ccsid, secure);
 			final ByteArrayOutputStream output = new ByteArrayOutputStream();
-			try (PrintStream stream = new PrintStream(output);
-					IBMi ibmi = new IBMi(stream, host, credentials, config.getCcsidInt(), secure, false)) {
+			try (PrintStream stream = new PrintStream(output, false, StandardCharsets.UTF_8);
+			     IBMi ibmi = new IBMi(stream, host, credentials, config.getCcsidInt(), secure, false)) {
 				return FormValidation.ok(Messages.IBMiServer_ConnectionOk(host, ibmi.getOSVersion()));
 			} catch (final Exception e) {
 				LOGGER.log(Level.SEVERE, Messages.IBMiServer_ConnectionFailed(e.getLocalizedMessage()), e);
