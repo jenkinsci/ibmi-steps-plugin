@@ -112,10 +112,10 @@ A [`CallResult`](#callresult) object.
 
 ```groovy
 //Create a library
-ibmiCommand "CRTLIB LIB(COOLSTUFF)"
+def library = 'COOLSTUFF'
+ibmiCommand "CRTLIB LIB($library)"
 
 //Create a library and carry on only if it exists
-def library = 'COOLSTUFF'
 def result = ibmiCommand(command: "CRTLIB LIB($library)", failOnError: false)
 if (!result.successful) {
     if (result.getMessage('CPF2111') != null) {
@@ -127,7 +127,7 @@ if (!result.successful) {
 }
 
 //Delete a library; carry on whatever happens
-ibmiCommand(command: "CRTLIB LIB(MAYBELIB)", failOnError: false)
+ibmiCommand(command: "DLTLIB LIB($library)", failOnError: false)
 
 ```
 
