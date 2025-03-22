@@ -74,6 +74,7 @@
 		<dependency>
 			<groupId>net.sf.jt400</groupId>
 			<artifactId>jt400</artifactId>
+			<classifier>java11</classifier>
 			<version>21.0.0</version>
 		</dependency>
 		<dependency>

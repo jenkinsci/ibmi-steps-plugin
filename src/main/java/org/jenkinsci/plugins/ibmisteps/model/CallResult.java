@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
 import com.ibm.as400.access.AS400Message;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -29,6 +30,11 @@ public class CallResult implements Serializable {
 
     public List<AS400Message> getMessages() {
         return messages;
+    }
+
+    @CheckForNull
+    public AS400Message getLastMessage() {
+        return messages.isEmpty() ? null : messages.get(messages.size()-1);
     }
 
     public String getPrettyMessages() {
