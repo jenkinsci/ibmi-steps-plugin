@@ -61,7 +61,7 @@ public class IBMiRunSQLStep extends IBMiStep<SQLResult> {
             }
             return result;
         } catch (final SQLException e) {
-            logger.log(Messages.IBMiRunSQLStep_failed(e.getLocalizedMessage()));
+            logger.error(Messages.IBMiRunSQLStep_failed(e.getLocalizedMessage()));
             throw e;
         }
     }
