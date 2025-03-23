@@ -38,8 +38,12 @@ public class CallResult implements Serializable {
     }
 
     public String getPrettyMessages() {
+        return getPrettyMessages("");
+    }
+
+    public String getPrettyMessages(final String prefix) {
         return messages.stream()
-                .map(m -> MessageFormat.format("[{0}][{1}] {2}", m.getID(), m.getSeverity(), m.getText()))
+                .map(m -> MessageFormat.format("{0}[{1}][{2}] {3}", prefix, m.getID(), m.getSeverity(), m.getText()))
                 .collect(Collectors.joining("\n"));
     }
 
