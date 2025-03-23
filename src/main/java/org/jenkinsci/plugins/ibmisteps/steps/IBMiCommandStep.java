@@ -18,7 +18,7 @@ public class IBMiCommandStep extends IBMiStep<CallResult> {
     private static final long serialVersionUID = 6443392002952411163L;
 
     private final String command;
-    private boolean failOnError;
+    private boolean failOnError = true;
 
     @DataBoundConstructor
     public IBMiCommandStep(final String command) {
