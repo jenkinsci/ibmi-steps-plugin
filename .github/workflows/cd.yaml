@@ -41,14 +41,14 @@ jobs:
       #   - Perform a validation only run with drafting a release note,
       #     if manually triggered AND inputs.validate_only has been checked.
       #
-      validate_only: ${{ inputs.validate_only == true }}
+      # validate_only: ${{ inputs.validate_only == true }}
       #
       # Alternative use case #2 (no automatic release):
       #   - Same as use case #1 - but:
       #     - Let any check_run trigger a validate_only run.
       #       => enforce the release job to be skipped.
       #
-      #validate_only: ${{ inputs.validate_only == true || github.event_name == 'check_run' }}
+      validate_only: ${{ inputs.validate_only == true || github.event_name == 'check_run' }}
     secrets:
       MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
       MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
