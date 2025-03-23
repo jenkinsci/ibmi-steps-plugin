@@ -1,13 +1,15 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.ibm.as400.access.*;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import hudson.FilePath;
+import hudson.Util;
+import hudson.util.Secret;
+import org.jenkinsci.plugins.ibmisteps.Messages;
+
 import java.beans.PropertyVetoException;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.Serializable;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,32 +17,6 @@ import java.sql.Statement;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.function.Consumer;
-
-import org.jenkinsci.plugins.ibmisteps.Messages;
-
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.AS400JDBCConnection;
-import com.ibm.as400.access.AS400JDBCDriver;
-import com.ibm.as400.access.AS400JDBCStatement;
-import com.ibm.as400.access.AS400Message;
-import com.ibm.as400.access.AS400SecurityException;
-import com.ibm.as400.access.CharConverter;
-import com.ibm.as400.access.CommandCall;
-import com.ibm.as400.access.ConnectionEvent;
-import com.ibm.as400.access.ConnectionListener;
-import com.ibm.as400.access.ErrorCompletingRequestException;
-import com.ibm.as400.access.IFSFile;
-import com.ibm.as400.access.IFSFileInputStream;
-import com.ibm.as400.access.IFSFileOutputStream;
-import com.ibm.as400.access.Job;
-import com.ibm.as400.access.ObjectDoesNotExistException;
-import com.ibm.as400.access.SecureAS400;
-
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import hudson.FilePath;
-import hudson.Util;
-import hudson.util.Secret;
 
 public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	private static final long serialVersionUID = -3164250407732394897L;
@@ -230,7 +206,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 			try {
 				sqlConnection.close();
 			} catch (final SQLException e) {
-				logger.log(Messages.IBMi_closeSQL_error(e));
+				logger.error(Messages.IBMi_closeSQL_error(e));
 			} finally {
 				sqlConnection = null;
 				databaseJob = null;

@@ -69,10 +69,10 @@ public class IBMiCommandStep extends IBMiStep<CallResult> {
 				error = Messages.IBMICommandStep_failed(command);
 			}
 			if (!failOnError) {
-				logger.log(error);
+				logger.error(error);
 				logger.trace(result.getPrettyMessages());
 			} else {
-				logger.log(result.getPrettyMessages());
+				logger.error(Messages.IBMICommandStep_failed(command) + "\n" + result.getPrettyMessages("\t"));
 				throw new AbortException(error);
 			}
 		}
