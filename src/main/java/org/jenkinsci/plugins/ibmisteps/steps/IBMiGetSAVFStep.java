@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.ibmisteps.steps;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.SaveFile;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
@@ -82,6 +83,7 @@ public class IBMiGetSAVFStep extends IBMiStep<SaveFileContent> {
             return "ibmiGetSAVF";
         }
 
+        @NonNull
         @Override
         public String getDisplayName() {
             return Messages.IBMiDownloadSAVF_description();
