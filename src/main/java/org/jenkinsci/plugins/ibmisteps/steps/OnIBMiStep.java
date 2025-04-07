@@ -186,7 +186,7 @@ public class OnIBMiStep extends Step implements Serializable {
 		}
 
 		@Override
-		public void expand(@NonNull final EnvVars env) throws IOException, InterruptedException {
+		public void expand(@NonNull final EnvVars env) {
 			env.putAll(ibmiEnvVars);
 		}
 
