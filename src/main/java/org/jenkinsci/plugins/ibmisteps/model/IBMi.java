@@ -1,22 +1,47 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.ibm.as400.access.*;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import hudson.FilePath;
-import hudson.Util;
-import hudson.util.Secret;
-import org.jenkinsci.plugins.ibmisteps.Messages;
-
 import java.beans.PropertyVetoException;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+
+import org.jenkinsci.plugins.ibmisteps.Messages;
+
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.AS400JDBCConnection;
+import com.ibm.as400.access.AS400JDBCDriver;
+import com.ibm.as400.access.AS400JDBCStatement;
+import com.ibm.as400.access.AS400Message;
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.CharConverter;
+import com.ibm.as400.access.CommandCall;
+import com.ibm.as400.access.ConnectionEvent;
+import com.ibm.as400.access.ConnectionListener;
+import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.IFSFile;
+import com.ibm.as400.access.IFSFileInputStream;
+import com.ibm.as400.access.IFSFileOutputStream;
+import com.ibm.as400.access.Job;
+import com.ibm.as400.access.ObjectDoesNotExistException;
+import com.ibm.as400.access.SecureAS400;
+
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import hudson.FilePath;
+import hudson.Util;
+import hudson.util.Secret;
 
 public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	private static final long serialVersionUID = -3164250407732394897L;
@@ -35,6 +60,8 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	private transient Job commandJob;
 	private transient Job databaseJob;
 	private transient AS400JDBCConnection sqlConnection;
+
+	private SpooledFileHandler spooledFileHandler;
 
 	public IBMi(final PrintStream stream, final String host, final StandardUsernamePasswordCredentials credentials,
 			final int ccsid, final boolean secure, final boolean doTrace) throws IOException, InterruptedException {
@@ -285,8 +312,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	 * @throws ErrorCompletingRequestException
 	 */
 	public boolean executeAndProcessQuery(final String query, final RowProcessor rowProcessor)
-			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException,
-			ErrorCompletingRequestException {
+			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException, ErrorCompletingRequestException {
 		boolean found = false;
 		try (final AS400JDBCStatement statement = getDB2Statement()) {
 			try (final ResultSet resultSet = statement.executeQuery(query)) {
@@ -368,5 +394,22 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 		}
 
 		return bytes;
+	}
+
+	public SpooledFileHandler getSpooledFileHandler() {
+		if (spooledFileHandler == null) {
+			final AtomicInteger checkCount = new AtomicInteger(0);
+			try {
+				executeAndProcessQuery("Select count(*) from QSYS2.sysroutines where routine_name in ('SPOOLED_FILE_DATA', 'SPOOLED_FILE_INFO')",
+						row -> checkCount.set(row.getInt(1)));
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+				logger.log(Messages.IBMi_failed_sql_service_check(e.getLocalizedMessage()));
+			} catch (SQLException | AS400SecurityException | ObjectDoesNotExistException | IOException | ErrorCompletingRequestException e) {
+				logger.log(Messages.IBMi_failed_sql_service_check(e.getLocalizedMessage()));
+			}
+			spooledFileHandler = checkCount.get() == 2 ? new SQLSpooledFilehandler() : new CLSpooledFilehandler();
+		}
+		return spooledFileHandler;
 	}
 }
