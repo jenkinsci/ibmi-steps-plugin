@@ -35,7 +35,7 @@ public class SQLSpooledFilehandler implements SpooledFileHandler {
 			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException,
 			ErrorCompletingRequestException {
 		final List<String> content = new ArrayList<>();
-		final String query = String.format(SPOOLED_FILE_DATA,
+		final String query = SPOOLED_FILE_DATA.formatted(
 				spooledFile.getJobNumber(),
 				spooledFile.getJobUser(),
 				spooledFile.getJobName(),
@@ -50,7 +50,7 @@ public class SQLSpooledFilehandler implements SpooledFileHandler {
 			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException,
 			ErrorCompletingRequestException {
 		final SpooledFiles spooledFiles = new SpooledFiles();
-		ibmi.executeAndProcessQuery(String.format(SPOOLED_FILE_INFO,
+		ibmi.executeAndProcessQuery(SPOOLED_FILE_INFO.formatted(
 				jobNumber,
 				jobUser,
 				jobName),
