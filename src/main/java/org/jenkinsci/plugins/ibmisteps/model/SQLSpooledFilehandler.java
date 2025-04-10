@@ -18,7 +18,7 @@ public class SQLSpooledFilehandler implements SpooledFileHandler {
 	private static final String SPOOLED_FILE_DATA = """
 			Select RTRIM(SPOOLED_DATA) \
 			From TABLE(SYSTOOLS.SPOOLED_FILE_DATA(JOB_NAME =>'%s/%s/%s', SPOOLED_FILE_NAME =>'%s', SPOOLED_FILE_NUMBER => %d)) \
-			Order By ORDINAL_POSITION
+			Order By ORDINAL_POSITION \
 			""";
 
 	private static final String SPOOLED_FILE_INFO = """
