@@ -16,14 +16,14 @@ public class SQLSpooledFilehandler implements SpooledFileHandler {
 	private static final long serialVersionUID = -115898412769496093L;
 
 	private static final String SPOOLED_FILE_DATA = """
-			Select RTRIM(SPOOLED_DATA)
-			From TABLE(SYSTOOLS.SPOOLED_FILE_DATA(JOB_NAME =>'%s/%s/%s', SPOOLED_FILE_NAME =>'%s', SPOOLED_FILE_NUMBER => %d))
+			Select RTRIM(SPOOLED_DATA) \
+			From TABLE(SYSTOOLS.SPOOLED_FILE_DATA(JOB_NAME =>'%s/%s/%s', SPOOLED_FILE_NAME =>'%s', SPOOLED_FILE_NUMBER => %d)) \
 			Order By ORDINAL_POSITION
 			""";
 
 	private static final String SPOOLED_FILE_INFO = """
-			Select SPOOLED_FILE_NAME, SPOOLED_FILE_NUMBER, SIZE, USER_DATA, JOB_NAME, JOB_USER, JOB_NUMBER
-			From Table(QSYS2.SPOOLED_FILE_INFO(JOB_NAME => '%s/%s/%s', STATUS => '*READY'))
+			Select SPOOLED_FILE_NAME, SPOOLED_FILE_NUMBER, SIZE, USER_DATA, JOB_NAME, JOB_USER, JOB_NUMBER \
+			From Table(QSYS2.SPOOLED_FILE_INFO(JOB_NAME => '%s/%s/%s', STATUS => '*READY')) \
 			""";
 
 	SQLSpooledFilehandler() {
