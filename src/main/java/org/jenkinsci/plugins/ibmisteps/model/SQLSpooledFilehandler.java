@@ -1,21 +1,30 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.ObjectDoesNotExistException;
+import hudson.FilePath;
+import org.jenkinsci.plugins.ibmisteps.model.SpooledFiles.SpooledFile;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jenkinsci.plugins.ibmisteps.model.SpooledFiles.SpooledFile;
-
-import com.ibm.as400.access.AS400SecurityException;
-import com.ibm.as400.access.ErrorCompletingRequestException;
-import com.ibm.as400.access.ObjectDoesNotExistException;
-
-import hudson.FilePath;
-
 public class SQLSpooledFilehandler implements SpooledFileHandler {
 	private static final long serialVersionUID = -115898412769496093L;
+
+	private static final String SPOOLED_FILE_DATA = """
+			Select RTRIM(SPOOLED_DATA)
+			From TABLE(SYSTOOLS.SPOOLED_FILE_DATA(JOB_NAME =>'%s/%s/%s', SPOOLED_FILE_NAME =>'%s', SPOOLED_FILE_NUMBER => %d))
+			Order By ORDINAL_POSITION
+			""";
+
+	private static final String SPOOLED_FILE_INFO = """
+			Select SPOOLED_FILE_NAME, SPOOLED_FILE_NUMBER, SIZE, USER_DATA, JOB_NAME, JOB_USER, JOB_NUMBER
+			From Table(QSYS2.SPOOLED_FILE_INFO(JOB_NAME => '%s/%s/%s', STATUS => '*READY'))
+			""";
 
 	SQLSpooledFilehandler() {
 
@@ -26,11 +35,7 @@ public class SQLSpooledFilehandler implements SpooledFileHandler {
 			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException,
 			ErrorCompletingRequestException {
 		final List<String> content = new ArrayList<>();
-		final String query = String.format("""
-				Select RTRIM(SPOOLED_DATA)
-				From TABLE(SYSTOOLS.SPOOLED_FILE_DATA(JOB_NAME =>'%s/%s/%s', SPOOLED_FILE_NAME =>'%s', SPOOLED_FILE_NUMBER => %d))
-				Order By ORDINAL_POSITION
-				""",
+		final String query = String.format(SPOOLED_FILE_DATA,
 				spooledFile.getJobNumber(),
 				spooledFile.getJobUser(),
 				spooledFile.getJobName(),
@@ -45,10 +50,7 @@ public class SQLSpooledFilehandler implements SpooledFileHandler {
 			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException,
 			ErrorCompletingRequestException {
 		final SpooledFiles spooledFiles = new SpooledFiles();
-		ibmi.executeAndProcessQuery(String.format("""
-				Select SPOOLED_FILE_NAME, SPOOLED_FILE_NUMBER, SIZE, USER_DATA, JOB_NAME, JOB_USER, JOB_NUMBER
-				From Table(QSYS2.SPOOLED_FILE_INFO(JOB_NAME => '%s/%s/%s', STATUS => '*READY'))
-				""",
+		ibmi.executeAndProcessQuery(String.format(SPOOLED_FILE_INFO,
 				jobNumber,
 				jobUser,
 				jobName),
