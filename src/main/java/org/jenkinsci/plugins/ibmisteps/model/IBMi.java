@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
@@ -36,8 +37,10 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	private transient Job databaseJob;
 	private transient AS400JDBCConnection sqlConnection;
 
+	private SpooledFileHandler spooledFileHandler;
+
 	public IBMi(final PrintStream stream, final String host, final StandardUsernamePasswordCredentials credentials,
-			final int ccsid, final boolean secure, final boolean doTrace) throws IOException, InterruptedException {
+	            final int ccsid, final boolean secure, final boolean doTrace) throws IOException, InterruptedException {
 		logger = new LoggerWrapper(stream, doTrace);
 		ibmiConnection = secure ? new SecureAS400() : new AS400();
 		try {
@@ -108,7 +111,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 
 		if (!isSYSBAS(iASP)) {
 			try (final Connection connection = new AS400JDBCDriver().connect(ibmiConnection);
-					final Statement statement = connection.createStatement()) {
+			     final Statement statement = connection.createStatement()) {
 				try (final ResultSet resultSet = statement.executeQuery(String.format(
 						"Select RDB_NAME From QSYS2.ASP_INFO Where DEVICE_DESCRIPTION_NAME = '%s' Fetch First row only",
 						iASP))) {
@@ -272,10 +275,8 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	}
 
 	/**
-	 * @param query
-	 *            a SQL query
-	 * @param rowProcessor
-	 *            a processor that will run a process on each row
+	 * @param query        a SQL query
+	 * @param rowProcessor a processor that will run a process on each row
 	 * @return <code>true</code> if at least one row was processed, <code>false</code> otherwise.
 	 * @throws SQLException
 	 * @throws AS400SecurityException
@@ -285,8 +286,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	 * @throws ErrorCompletingRequestException
 	 */
 	public boolean executeAndProcessQuery(final String query, final RowProcessor rowProcessor)
-			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException,
-			ErrorCompletingRequestException {
+			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException, ErrorCompletingRequestException {
 		boolean found = false;
 		try (final AS400JDBCStatement statement = getDB2Statement()) {
 			try (final ResultSet resultSet = statement.executeQuery(query)) {
@@ -342,7 +342,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	public long download(final IFSFile from, final FilePath to)
 			throws IOException, AS400SecurityException, InterruptedException {
 		try (InputStream input = new BufferedInputStream(new IFSFileInputStream(from));
-				OutputStream output = new BufferedOutputStream(to.write())) {
+		     OutputStream output = new BufferedOutputStream(to.write())) {
 			return copy(input, output);
 		}
 	}
@@ -353,7 +353,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 			to.getParentFile().mkdirs();
 		}
 		try (InputStream input = new BufferedInputStream(from.read());
-				OutputStream output = new BufferedOutputStream(new IFSFileOutputStream(to))) {
+		     OutputStream output = new BufferedOutputStream(new IFSFileOutputStream(to))) {
 			return copy(input, output);
 		}
 	}
@@ -368,5 +368,30 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 		}
 
 		return bytes;
+	}
+
+	public SpooledFileHandler getSpooledFileHandler() {
+		if (spooledFileHandler == null) {
+			final AtomicInteger checkCount = new AtomicInteger(0);
+			try {
+				executeAndProcessQuery("Select count(*) from QSYS2.sysroutines where routine_name in ('SPOOLED_FILE_DATA', 'SPOOLED_FILE_INFO')",
+						row -> checkCount.set(row.getInt(1)));
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+				logger.log(Messages.IBMi_failed_sql_service_check(e.getLocalizedMessage()));
+			} catch (SQLException | AS400SecurityException | ObjectDoesNotExistException | IOException |
+			         ErrorCompletingRequestException e) {
+				logger.log(Messages.IBMi_failed_sql_service_check(e.getLocalizedMessage()));
+			}
+
+			if (checkCount.get() == 2) {
+				logger.trace("Using SQL spooled files handler");
+				spooledFileHandler = new SQLSpooledFilehandler();
+			} else {
+				logger.trace("Using CL spooled files handler");
+				spooledFileHandler = new CLSpooledFilehandler();
+			}
+		}
+		return spooledFileHandler;
 	}
 }

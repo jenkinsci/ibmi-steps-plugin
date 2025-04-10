@@ -1,37 +1,9 @@
 package org.jenkinsci.plugins.ibmisteps.steps;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.jenkinsci.plugins.ibmisteps.Messages;
-import org.jenkinsci.plugins.ibmisteps.configuration.IBMiGlobalConfiguration;
-import org.jenkinsci.plugins.ibmisteps.configuration.IBMiServerConfiguration;
-import org.jenkinsci.plugins.ibmisteps.model.IBMi;
-import org.jenkinsci.plugins.ibmisteps.model.IBMiContext;
-import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
-import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
-import org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
-import org.jenkinsci.plugins.workflow.steps.Step;
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
-import org.jenkinsci.plugins.workflow.steps.StepExecution;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.interceptor.RequirePOST;
-
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.google.common.collect.ImmutableSet;
 import com.ibm.as400.access.AS400SecurityException;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -40,6 +12,26 @@ import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.util.ListBoxModel;
+import org.jenkinsci.plugins.ibmisteps.Messages;
+import org.jenkinsci.plugins.ibmisteps.configuration.IBMiGlobalConfiguration;
+import org.jenkinsci.plugins.ibmisteps.configuration.IBMiServerConfiguration;
+import org.jenkinsci.plugins.ibmisteps.model.IBMi;
+import org.jenkinsci.plugins.ibmisteps.model.IBMiContext;
+import org.jenkinsci.plugins.workflow.steps.*;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class OnIBMiStep extends Step implements Serializable {
 	private static final long serialVersionUID = 4356326103523728526L;
@@ -194,7 +186,7 @@ public class OnIBMiStep extends Step implements Serializable {
 		}
 
 		@Override
-		public void expand(final EnvVars env) throws IOException, InterruptedException {
+		public void expand(@NonNull final EnvVars env) {
 			env.putAll(ibmiEnvVars);
 		}
 
