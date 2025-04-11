@@ -18,6 +18,8 @@ IFS transfers.
   - [ibmiPutIFS](#ibmiputifs)
   - [ibmiGetSPLF](#ibmigetsplf)
   - [ibmiWaitJob](#ibmiwaitjob)
+- [Enumrations](#enumrations)
+  - [OnMSGW](#onmsgw)
 - [Returned objects](#returned-objects)
   - [CallResult](#callresult)
   - [IBMiJob](#ibmijob)
@@ -306,28 +308,40 @@ Wait for a Job to end and blocks the pipeline execution.
 
 #### Parameters
 
-| Name    | Required | Type     | Description                                                                                          |
-|:--------|:---------|:---------|:-----------------------------------------------------------------------------------------------------|
-| name    | ☑        | `String` | The Job name.                                                                                        |
-| number  | ☑        | `String` | The Job number.                                                                                      |
-| user    | ☑        | `String` | The Job user.                                                                                        |
-| timeout | ✖        | `int`    | A timeout in seconds after which the pipeline execution will carry on even of the Job has not ended. |
+| Name    | Required | Type                | Description                                                                                                                      |
+|:--------|:---------|:--------------------|:---------------------------------------------------------------------------------------------------------------------------------|
+| name    | ☑        | `String`            | The Job name.                                                                                                                    |
+| number  | ☑        | `String`            | The Job number.                                                                                                                  |
+| user    | ☑        | `String`            | The Job user.                                                                                                                    |
+| timeout | ✖        | `int`               | A timeout in seconds after which the pipeline execution will carry on even of the Job has not ended.                             |
+| onMSGW  | ✖        | [`OnMSGW`](#onmsgw) | The action to take when the Job hits the MSGW status. Possible values are: `WAIT`, `FAIL`, `KILL`, `RESUME`; defaults to `WAIT`. |
 
 #### Returned value
 
-A [`Job`]([#spooledfiles](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/package-summary.html)) object.
+A [`Job`](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/package-summary.html) object.
 
 #### Example
 
 ```groovy
-def result = ibmiCommand "SBMJOB CMD(DLYJOB 5)"
+def result = ibmiCommand "SBMJOB CMD(COMPILE...)"
 if(result.successful) {
     def job = result.getSubmittedJobs().getAt(0)
     if(job){
-        ibmiWaitJob name: job.name, number: job.number, user: job.user
+        //Wait for the job and fail pipeline if it hits MSGW status
+        ibmiWaitJob name: job.name, number: job.number, user: job.user, onMSGW: 'FAIL'
     }
 }
 ```
+
+## Enumrations
+
+### OnMSGW
+| Value  | Description                                          |
+|:-------|:-----------------------------------------------------|
+| FAIL   | Stop the pipeline execution and marks it as failed.  |
+| KILL   | Kill the Job and resume pipeline execution.          |
+| RESUME | Leave the Job in MSGW and resume pipeline execution. |
+| WAIT   | Wait for the Job to be killed or resumed.            |
 
 ## Returned objects
 

@@ -11,6 +11,10 @@
     </f:entry>
 
     <f:entry title="${%timeout}" field="timeout">
-        <f:number min="0"/>
+        <f:number min="0" />
+    </f:entry>
+
+    <f:entry title="${%onMSGW}" description="${%onMSGW.description}" field="onMSGW">
+        <f:enum default="WAIT">${it.displayName}</f:enum>
     </f:entry>
 </j:jelly>
