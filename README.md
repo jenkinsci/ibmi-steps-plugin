@@ -18,7 +18,7 @@ IFS transfers.
   - [ibmiPutIFS](#ibmiputifs)
   - [ibmiGetSPLF](#ibmigetsplf)
   - [ibmiWaitJob](#ibmiwaitjob)
-- [Enumrations](#enumrations)
+- [Enumerations](#enumerations)
   - [OnMSGW](#onmsgw)
 - [Returned objects](#returned-objects)
   - [CallResult](#callresult)
@@ -333,7 +333,7 @@ if(result.successful) {
 }
 ```
 
-## Enumrations
+## Enumerations
 
 ### OnMSGW
 | Value  | Description                                          |
