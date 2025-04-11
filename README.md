@@ -17,6 +17,9 @@ IFS transfers.
   - [ibmiGetIFS](#ibmigetifs)
   - [ibmiPutIFS](#ibmiputifs)
   - [ibmiGetSPLF](#ibmigetsplf)
+  - [ibmiWaitJob](#ibmiwaitjob)
+- [Enumerations](#enumerations)
+  - [OnMSGW](#onmsgw)
 - [Returned objects](#returned-objects)
   - [CallResult](#callresult)
   - [IBMiJob](#ibmijob)
@@ -299,6 +302,47 @@ print "${spooledFiles.size} spooled file(s) downloaded"
 spooledFiles.each { splf -> print "${splf.name} (${splf.number})" }
 ```
 
+### ibmiWaitJob
+
+Wait for a Job to end and blocks the pipeline execution.
+
+#### Parameters
+
+| Name    | Required | Type                | Description                                                                                                                      |
+|:--------|:---------|:--------------------|:---------------------------------------------------------------------------------------------------------------------------------|
+| name    | ☑        | `String`            | The Job name.                                                                                                                    |
+| number  | ☑        | `String`            | The Job number.                                                                                                                  |
+| user    | ☑        | `String`            | The Job user.                                                                                                                    |
+| timeout | ✖        | `int`               | A timeout in seconds after which the pipeline execution will carry on even of the Job has not ended.                             |
+| onMSGW  | ✖        | [`OnMSGW`](#onmsgw) | The action to take when the Job hits the MSGW status. Possible values are: `WAIT`, `FAIL`, `KILL`, `RESUME`; defaults to `WAIT`. |
+
+#### Returned value
+
+A [`Job`](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/package-summary.html) object.
+
+#### Example
+
+```groovy
+def result = ibmiCommand "SBMJOB CMD(COMPILE...)"
+if(result.successful) {
+    def job = result.getSubmittedJobs().getAt(0)
+    if(job){
+        //Wait for the job and fail pipeline if it hits MSGW status
+        ibmiWaitJob name: job.name, number: job.number, user: job.user, onMSGW: 'FAIL'
+    }
+}
+```
+
+## Enumerations
+
+### OnMSGW
+| Value  | Description                                          |
+|:-------|:-----------------------------------------------------|
+| FAIL   | Stop the pipeline execution and marks it as failed.  |
+| KILL   | Kill the Job and resume pipeline execution.          |
+| RESUME | Leave the Job in MSGW and resume pipeline execution. |
+| WAIT   | Wait for the Job to be killed or resumed.            |
+
 ## Returned objects
 
 ### CallResult
@@ -452,10 +496,13 @@ node {
     stage('Compile') {
         //Submit DSPOBJD to produce a spooled file with QGPL's objects information
         def result = ibmiCommand 'SBMJOB CMD(DSPOBJD OBJ(QGPL/*ALL) OBJTYPE(*ALL) OUTPUT(*PRINT)) JOB(DETAILS)'
-        
+
         //Get the submitted job information (there can be only one)
-        def job = result.getSubmittedJobs()[0];
-        
+        def job = result.getSubmittedJobs().getAt(0)
+
+        //Wait for the job to end
+        ibmiWaitJob name: job.name, number: job.number, user: job.user
+
         //Download the job's spooled files
         ibmiGetSPLF jobName: job.name, jobNumber: job.number, jobUser: job.user, to: 'objects'
     }
