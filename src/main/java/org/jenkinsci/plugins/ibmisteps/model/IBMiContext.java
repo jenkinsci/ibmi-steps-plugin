@@ -1,16 +1,17 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
-import java.beans.PropertyVetoException;
-import java.io.IOException;
-import java.io.Serializable;
-
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
-
 import hudson.model.TaskListener;
 
+import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
+
 public class IBMiContext implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 7477349510791081645L;
 	private final String host;
 	private final StandardUsernamePasswordCredentials credentials;
@@ -21,11 +22,11 @@ public class IBMiContext implements Serializable {
 	private transient IBMi ibmi;
 
 	public IBMiContext(final String host,
-			final StandardUsernamePasswordCredentials credentials,
-			final int ccsid,
-			final boolean secure,
-			final String iasp,
-			final boolean traceEnabled) {
+	                   final StandardUsernamePasswordCredentials credentials,
+	                   final int ccsid,
+	                   final boolean secure,
+	                   final String iasp,
+	                   final boolean traceEnabled) {
 		this.host = host;
 		this.credentials = credentials;
 		this.ccsid = ccsid;

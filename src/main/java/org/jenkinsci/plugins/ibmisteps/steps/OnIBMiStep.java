@@ -26,6 +26,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class OnIBMiStep extends Step implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 4356326103523728526L;
 
 	private final String server;
@@ -53,13 +55,13 @@ public class OnIBMiStep extends Step implements Serializable {
 		return traceEnabled;
 	}
 
-	public String getIasp() {
-		return iasp;
-	}
-
 	@DataBoundSetter
 	public void setTraceEnabled(final boolean traceEnabled) {
 		this.traceEnabled = traceEnabled;
+	}
+
+	public String getIasp() {
+		return iasp;
 	}
 
 	@DataBoundSetter
@@ -68,8 +70,9 @@ public class OnIBMiStep extends Step implements Serializable {
 	}
 
 	@Override
-	public StepExecution start(final StepContext context) throws Exception {
+	public StepExecution start(final StepContext context) {
 		return new GeneralNonBlockingStepExecution(context) {
+			@Serial
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -80,8 +83,8 @@ public class OnIBMiStep extends Step implements Serializable {
 				if (serverConfig != null) {
 					final StandardUsernamePasswordCredentials credentials = serverConfig.getCredentialsId() != null
 							? CredentialsProvider.findCredentialById(serverConfig.getCredentialsId(),
-									StandardUsernamePasswordCredentials.class,
-									getContext().get(Run.class))
+							StandardUsernamePasswordCredentials.class,
+							getContext().get(Run.class))
 							: null;
 
 					final IBMiContext ibmiContext = new IBMiContext(serverConfig.getHost(),
@@ -154,6 +157,7 @@ public class OnIBMiStep extends Step implements Serializable {
 	}
 
 	private static class Callback extends BodyExecutionCallback.TailCall {
+		@Serial
 		private static final long serialVersionUID = 4348731407610313151L;
 
 		private final IBMiContext ibmiContext;
@@ -169,6 +173,7 @@ public class OnIBMiStep extends Step implements Serializable {
 	}
 
 	private static class IBMiExpander extends EnvironmentExpander {
+		@Serial
 		private static final long serialVersionUID = -1512948481734939923L;
 
 		private final Map<String, String> ibmiEnvVars = new HashMap<>();

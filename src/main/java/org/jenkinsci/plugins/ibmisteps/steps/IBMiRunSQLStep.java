@@ -12,57 +12,59 @@ import org.jenkinsci.plugins.ibmisteps.steps.abstracts.IBMiStepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.io.Serial;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class IBMiRunSQLStep extends IBMiStep<SQLResult> {
-    private static final long serialVersionUID = 5802097350903272246L;
+	@Serial
+	private static final long serialVersionUID = 5802097350903272246L;
 
-    private final String sql;
+	private final String sql;
 
-    @DataBoundConstructor
-    public IBMiRunSQLStep(final String sql) {
-        this.sql = sql;
-    }
+	@DataBoundConstructor
+	public IBMiRunSQLStep(final String sql) {
+		this.sql = sql;
+	}
 
-    public String getSql() {
-        return sql;
-    }
+	public String getSql() {
+		return sql;
+	}
 
-    @Extension
-    public static class DescriptorImpl extends IBMiStepDescriptor {
-        @Override
-        public String getFunctionName() {
-            return "ibmiRunSQL";
-        }
+	@Override
+	protected SQLResult runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
+			throws Exception {
+		logger.log(Messages.IBMiRunSQLStep_running(sql));
 
-        @NonNull
-        @Override
-        public String getDisplayName() {
-            return Messages.IBMiRunSQLStep_description();
-        }
-    }
+		try (AS400JDBCStatement statement = ibmi.getDB2Statement()) {
+			final SQLResult result;
+			if (statement.execute(sql)) {
+				final ResultSet resultSet = statement.getResultSet();
+				result = new SQLResult(resultSet);
+				logger.trace(Messages.IBMiRunSQLStep_rows(result.getRowCount()));
 
-    @Override
-    protected SQLResult runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
-            throws Exception {
-        logger.log(Messages.IBMiRunSQLStep_running(sql));
+			} else {
+				result = new SQLResult(statement.getUpdateCount());
+				logger.trace(Messages.IBMiRunSQLStep_updated(result.getUpdateCount()));
+			}
+			return result;
+		} catch (final SQLException e) {
+			logger.error(Messages.IBMiRunSQLStep_failed(e.getLocalizedMessage()));
+			throw e;
+		}
+	}
 
-        try (AS400JDBCStatement statement = ibmi.getDB2Statement()) {
-            final SQLResult result;
-            if (statement.execute(sql)) {
-                final ResultSet resultSet = statement.getResultSet();
-                result = new SQLResult(resultSet);
-                logger.trace(Messages.IBMiRunSQLStep_rows(result.getRowCount()));
+	@Extension
+	public static class DescriptorImpl extends IBMiStepDescriptor {
+		@Override
+		public String getFunctionName() {
+			return "ibmiRunSQL";
+		}
 
-            } else {
-                result = new SQLResult(statement.getUpdateCount());
-                logger.trace(Messages.IBMiRunSQLStep_updated(result.getUpdateCount()));
-            }
-            return result;
-        } catch (final SQLException e) {
-            logger.error(Messages.IBMiRunSQLStep_failed(e.getLocalizedMessage()));
-            throw e;
-        }
-    }
+		@NonNull
+		@Override
+		public String getDisplayName() {
+			return Messages.IBMiRunSQLStep_description();
+		}
+	}
 }

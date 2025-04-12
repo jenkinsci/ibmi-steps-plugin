@@ -15,10 +15,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.time.Duration;
 import java.time.Instant;
 
 public class IBMiWaitJobStep extends IBMiStep<Job> {
+	@Serial
 	private static final long serialVersionUID = 6918372653694281442L;
 
 	private final String name;
@@ -33,16 +35,6 @@ public class IBMiWaitJobStep extends IBMiStep<Job> {
 		this.name = name;
 		this.number = number;
 		this.user = user;
-	}
-
-	@DataBoundSetter
-	public void setTimeout(final int timeout) {
-		this.timeout = timeout;
-	}
-
-	@DataBoundSetter
-	public void setOnMSGW(final OnMessageWait onMSGW) {
-		this.onMSGW = onMSGW;
 	}
 
 	public String getName() {
@@ -61,22 +53,18 @@ public class IBMiWaitJobStep extends IBMiStep<Job> {
 		return timeout;
 	}
 
+	@DataBoundSetter
+	public void setTimeout(final int timeout) {
+		this.timeout = timeout;
+	}
+
 	public OnMessageWait getOnMSGW() {
 		return onMSGW;
 	}
 
-	@Extension
-	public static class DescritptorImpl extends IBMiStepDescriptor {
-		@Override
-		public String getFunctionName() {
-			return "ibmiWaitJob";
-		}
-
-		@NonNull
-		@Override
-		public String getDisplayName() {
-			return Messages.IBMiWaitJob_description();
-		}
+	@DataBoundSetter
+	public void setOnMSGW(final OnMessageWait onMSGW) {
+		this.onMSGW = onMSGW;
 	}
 
 	@Override
@@ -99,11 +87,9 @@ public class IBMiWaitJobStep extends IBMiStep<Job> {
 
 				Thread.sleep(500);
 			}
-		}
-		catch(AbortException e){
+		} catch (AbortException e) {
 			throw e;
-		}
-		catch (AS400SecurityException | IOException | ObjectDoesNotExistException |
+		} catch (AS400SecurityException | IOException | ObjectDoesNotExistException |
 		         ErrorCompletingRequestException e) {
 			logger.log(Messages.IBMiWaitJob_error(e.getLocalizedMessage()));
 		}
@@ -173,6 +159,20 @@ public class IBMiWaitJobStep extends IBMiStep<Job> {
 		// That exception should be interpreted as an indication that the job has completed.
 		if (!e.getAS400Message().getID().equals("CPF3C52")) {
 			throw e;
+		}
+	}
+
+	@Extension
+	public static class DescritptorImpl extends IBMiStepDescriptor {
+		@Override
+		public String getFunctionName() {
+			return "ibmiWaitJob";
+		}
+
+		@NonNull
+		@Override
+		public String getDisplayName() {
+			return Messages.IBMiWaitJob_description();
 		}
 	}
 }

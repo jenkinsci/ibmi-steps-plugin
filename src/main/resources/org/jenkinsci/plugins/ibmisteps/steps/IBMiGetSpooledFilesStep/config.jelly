@@ -4,14 +4,14 @@
         <f:textbox/>
     </f:entry>
 
-	<f:entry title="${%JobNumber}" field="jobNumber">
+    <f:entry title="${%JobNumber}" field="jobNumber">
         <f:textbox/>
     </f:entry>
-    
+
     <f:entry title="${%JobUser}" field="jobUser">
         <f:textbox/>
     </f:entry>
-    
+
     <f:entry title="${%To}" field="to">
         <f:textbox/>
     </f:entry>

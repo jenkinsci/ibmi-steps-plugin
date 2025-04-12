@@ -1,13 +1,15 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+
 public class SpooledFiles extends ArrayList<SpooledFiles.SpooledFile> {
+	@Serial
 	private static final long serialVersionUID = 1551585884795126297L;
 
 	public String toJSON() throws JsonProcessingException {
@@ -16,6 +18,7 @@ public class SpooledFiles extends ArrayList<SpooledFiles.SpooledFile> {
 	}
 
 	public static class SpooledFile implements Serializable {
+		@Serial
 		private static final long serialVersionUID = -4169248633194708888L;
 
 		private final String jobName;
@@ -29,7 +32,7 @@ public class SpooledFiles extends ArrayList<SpooledFiles.SpooledFile> {
 		private final String fileName;
 
 		public SpooledFile(final String name, final int number, final long size, final String userData,
-				final String jobName, final String jobUser, final String jobNumber) {
+		                   final String jobName, final String jobUser, final String jobNumber) {
 			this.name = name;
 			this.number = number;
 			this.jobName = jobName;

@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.ibmisteps.model;
 import com.ibm.as400.access.AS400Message;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CallResult implements Serializable {
+	@Serial
 	private static final long serialVersionUID = -7184769518123385346L;
 
 	private static final Pattern JOB_PATTERN = Pattern.compile(" (\\d{1,6})/([^/ ]{1,10})/([^/ ]{1,10}) ");

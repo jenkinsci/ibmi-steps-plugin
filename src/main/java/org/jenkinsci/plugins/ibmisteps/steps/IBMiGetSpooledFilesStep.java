@@ -1,7 +1,8 @@
 package org.jenkinsci.plugins.ibmisteps.steps;
 
-import java.text.MessageFormat;
-
+import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.Extension;
+import hudson.FilePath;
 import org.jenkinsci.plugins.ibmisteps.Messages;
 import org.jenkinsci.plugins.ibmisteps.model.IBMi;
 import org.jenkinsci.plugins.ibmisteps.model.LoggerWrapper;
@@ -13,11 +14,11 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.Extension;
-import hudson.FilePath;
+import java.io.Serial;
+import java.text.MessageFormat;
 
 public class IBMiGetSpooledFilesStep extends IBMiStep<SpooledFiles> {
+	@Serial
 	private static final long serialVersionUID = 1880307039400864220L;
 
 	private final String jobName;
@@ -28,7 +29,7 @@ public class IBMiGetSpooledFilesStep extends IBMiStep<SpooledFiles> {
 
 	@DataBoundConstructor
 	public IBMiGetSpooledFilesStep(final String jobName, final String jobNumber, final String jobUser,
-			final String to) {
+	                               final String to) {
 		this.jobName = jobName.trim().toUpperCase();
 		this.jobUser = jobUser.trim().toUpperCase();
 		this.jobNumber = jobNumber.trim().toUpperCase();

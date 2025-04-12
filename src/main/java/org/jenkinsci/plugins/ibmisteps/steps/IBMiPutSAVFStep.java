@@ -18,76 +18,78 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
+import java.io.Serial;
 
 public class IBMiPutSAVFStep extends IBMiStep<SaveFileContent> {
-    private static final long serialVersionUID = 8285322833287436551L;
+	@Serial
+	private static final long serialVersionUID = 8285322833287436551L;
 
-    private final String library;
-    private final String name;
-    private final String fromFile;
+	private final String library;
+	private final String name;
+	private final String fromFile;
 
-    @DataBoundConstructor
-    public IBMiPutSAVFStep(final String library, final String name, final String fromFile) {
-        this.fromFile = fromFile;
-        this.library = library.trim().toUpperCase();
-        this.name = name.trim().toUpperCase();
-    }
+	@DataBoundConstructor
+	public IBMiPutSAVFStep(final String library, final String name, final String fromFile) {
+		this.fromFile = fromFile;
+		this.library = library.trim().toUpperCase();
+		this.name = name.trim().toUpperCase();
+	}
 
-    public String getFromFile() {
-        return fromFile;
-    }
+	public String getFromFile() {
+		return fromFile;
+	}
 
-    public String getLibrary() {
-        return library;
-    }
+	public String getLibrary() {
+		return library;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    protected SaveFileContent runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
-            throws Exception {
-        final FilePath workspaceFile = context.get(FilePath.class).child(fromFile);
-        if (!workspaceFile.exists()) {
-            throw new AbortException(Messages.IBMiUploadSAVF_workspace_file_not_found(workspaceFile));
-        }
-        logger.log(Messages.IBMiUploadSAVF_uploading(fromFile, library, name, workspaceFile.length()));
+	@Override
+	protected SaveFileContent runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
+			throws Exception {
+		final FilePath workspaceFile = context.get(FilePath.class).child(fromFile);
+		if (!workspaceFile.exists()) {
+			throw new AbortException(Messages.IBMiUploadSAVF_workspace_file_not_found(workspaceFile));
+		}
+		logger.log(Messages.IBMiUploadSAVF_uploading(fromFile, library, name, workspaceFile.length()));
 
-        final SaveFile saveFile = new SaveFile(ibmi.getIbmiConnection(), library, name);
-        ibmi.withTempFile(tempFile -> {
-            try {
-                logger.trace("Uploading %s to %s", workspaceFile, tempFile);
-                ibmi.upload(workspaceFile, tempFile);
+		final SaveFile saveFile = new SaveFile(ibmi.getIbmiConnection(), library, name);
+		ibmi.withTempFile(tempFile -> {
+			try {
+				logger.trace("Uploading %s to %s", workspaceFile, tempFile);
+				ibmi.upload(workspaceFile, tempFile);
 
-                final String copyCommand = String.format("CPYFRMSTMF FROMSTMF('%s') TOMBR('%s') MBROPT(*REPLACE)",
-                        tempFile.getAbsolutePath(), saveFile.getPath());
-                logger.trace("Running " + copyCommand);
+				final String copyCommand = String.format("CPYFRMSTMF FROMSTMF('%s') TOMBR('%s') MBROPT(*REPLACE)",
+						tempFile.getAbsolutePath(), saveFile.getPath());
+				logger.trace("Running " + copyCommand);
 
-                final CallResult copyResult = ibmi.executeCommand(copyCommand);
-                if (!copyResult.isSuccessful()) {
-                    throw new AbortException(Messages.IBMiUploadSAVF_CPYFRMSTMF_failed(tempFile, library, name,
-                            copyResult.getPrettyMessages()));
-                }
-            } catch (AS400SecurityException | ErrorCompletingRequestException e) {
-                throw new IOException(e);
-            }
-        });
+				final CallResult copyResult = ibmi.executeCommand(copyCommand);
+				if (!copyResult.isSuccessful()) {
+					throw new AbortException(Messages.IBMiUploadSAVF_CPYFRMSTMF_failed(tempFile, library, name,
+							copyResult.getPrettyMessages()));
+				}
+			} catch (AS400SecurityException | ErrorCompletingRequestException e) {
+				throw new IOException(e);
+			}
+		});
 
-        return new SaveFileContent(saveFile);
-    }
+		return new SaveFileContent(saveFile);
+	}
 
-    @Extension
-    public static class DescriptorImpl extends IBMiStepDescriptor {
-        @Override
-        public String getFunctionName() {
-            return "ibmiPutSAVF";
-        }
+	@Extension
+	public static class DescriptorImpl extends IBMiStepDescriptor {
+		@Override
+		public String getFunctionName() {
+			return "ibmiPutSAVF";
+		}
 
-        @NonNull
-        @Override
-        public String getDisplayName() {
-            return Messages.IBMiUploadSAVF_description();
-        }
-    }
+		@NonNull
+		@Override
+		public String getDisplayName() {
+			return Messages.IBMiUploadSAVF_description();
+		}
+	}
 }

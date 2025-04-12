@@ -1,25 +1,9 @@
 package org.jenkinsci.plugins.ibmisteps.configuration;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.jenkinsci.plugins.ibmisteps.Messages;
-import org.jenkinsci.plugins.ibmisteps.model.IBMi;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.interceptor.RequirePOST;
-
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
@@ -29,6 +13,20 @@ import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.ibmisteps.Messages;
+import org.jenkinsci.plugins.ibmisteps.model.IBMi;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerConfiguration> {
 	private static final Logger LOGGER = Logger.getLogger(IBMiServerConfiguration.class.getName());
@@ -41,7 +39,7 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 
 	@DataBoundConstructor
 	public IBMiServerConfiguration(final String name, final String host, final String credentialsId, final String ccsid,
-			final boolean secure) {
+	                               final boolean secure) {
 		this.name = name;
 		this.host = host;
 		this.credentialsId = credentialsId;
@@ -67,7 +65,7 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 
 	/**
 	 * @return <code>0</code> if CCSID is blank, <code>-1</code> if CCSID is not a number, CCSID as an <code>int</code>
-	 *         otherwise.
+	 * otherwise.
 	 */
 	public int getCcsidInt() {
 		try {
@@ -148,10 +146,10 @@ public class IBMiServerConfiguration extends AbstractDescribableImpl<IBMiServerC
 
 		@RequirePOST
 		public final FormValidation doTestConnection(@QueryParameter(required = true) final String host,
-				@QueryParameter(required = true) final String credentialsId,
-				@QueryParameter(required = false) final String ccsid,
-				@QueryParameter(required = false) final boolean secure,
-				@AncestorInPath final Item item) {
+		                                             @QueryParameter(required = true) final String credentialsId,
+		                                             @QueryParameter final String ccsid,
+		                                             @QueryParameter final boolean secure,
+		                                             @AncestorInPath final Item item) {
 			Jenkins.get().checkPermission(Jenkins.ADMINISTER);
 
 			final StandardUsernamePasswordCredentials credentials = CredentialsMatchers.firstOrNull(

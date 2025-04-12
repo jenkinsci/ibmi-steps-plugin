@@ -1,8 +1,11 @@
 package org.jenkinsci.plugins.ibmisteps.steps;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.IFSFile;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.AbortException;
+import hudson.Extension;
+import hudson.FilePath;
 import org.jenkinsci.plugins.ibmisteps.Messages;
 import org.jenkinsci.plugins.ibmisteps.model.IBMi;
 import org.jenkinsci.plugins.ibmisteps.model.LoggerWrapper;
@@ -11,15 +14,12 @@ import org.jenkinsci.plugins.ibmisteps.steps.abstracts.IBMiStepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import com.ibm.as400.access.AS400SecurityException;
-import com.ibm.as400.access.IFSFile;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.AbortException;
-import hudson.Extension;
-import hudson.FilePath;
+import java.io.IOException;
+import java.io.Serial;
+import java.text.MessageFormat;
 
 public class IBMiGetIFSStep extends IBMiStep<Void> {
+	@Serial
 	private static final long serialVersionUID = -6721839340320567902L;
 
 	private final String from;
@@ -37,20 +37,6 @@ public class IBMiGetIFSStep extends IBMiStep<Void> {
 
 	public String getTo() {
 		return to;
-	}
-
-	@Extension
-	public static class DescriptorImpl extends IBMiStepDescriptor {
-		@Override
-		public String getFunctionName() {
-			return "ibmiGetIFS";
-		}
-
-		@NonNull
-		@Override
-		public String getDisplayName() {
-			return Messages.IBMiGetIFSStep_description();
-		}
 	}
 
 	@Override
@@ -94,7 +80,7 @@ public class IBMiGetIFSStep extends IBMiStep<Void> {
 	}
 
 	private void getFolder(final LoggerWrapper logger, final IBMi ibmi, final IFSFile ifsFolder,
-			final FilePath folder) throws IOException, InterruptedException, AS400SecurityException {
+	                       final FilePath folder) throws IOException, InterruptedException, AS400SecurityException {
 		ifsFolder.setPatternMatching(IFSFile.PATTERN_POSIX_ALL);
 		for (final IFSFile item : ifsFolder.listFiles()) {
 			if (item.isDirectory()) {
@@ -102,6 +88,20 @@ public class IBMiGetIFSStep extends IBMiStep<Void> {
 			} else if (item.isFile()) {
 				getFile(logger, ibmi, item, folder);
 			}
+		}
+	}
+
+	@Extension
+	public static class DescriptorImpl extends IBMiStepDescriptor {
+		@Override
+		public String getFunctionName() {
+			return "ibmiGetIFS";
+		}
+
+		@NonNull
+		@Override
+		public String getDisplayName() {
+			return Messages.IBMiGetIFSStep_description();
 		}
 	}
 }
