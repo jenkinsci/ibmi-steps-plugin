@@ -277,7 +277,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	/**
 	 * @param query        a SQL query
 	 * @param rowProcessor a processor that will run a process on each row
-	 * @return <code>true</code> if at least one row was processed, <code>false</code> otherwise.
+	 *
 	 * @throws SQLException
 	 * @throws AS400SecurityException
 	 * @throws ObjectDoesNotExistException
