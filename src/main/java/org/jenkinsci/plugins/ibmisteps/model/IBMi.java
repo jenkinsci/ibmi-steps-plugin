@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
-	private static final long serialVersionUID = -3164250407732394897L;
-
 	public static final String SYSBAS = "*SYSBAS";
+	@Serial
+	private static final long serialVersionUID = -3164250407732394897L;
 	private final AS400 ibmiConnection;
 	private final transient LoggerWrapper logger;
 
@@ -277,7 +277,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	/**
 	 * @param query        a SQL query
 	 * @param rowProcessor a processor that will run a process on each row
-	 * @return <code>true</code> if at least one row was processed, <code>false</code> otherwise.
+	 *
 	 * @throws SQLException
 	 * @throws AS400SecurityException
 	 * @throws ObjectDoesNotExistException
@@ -285,19 +285,15 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	 * @throws InterruptedException
 	 * @throws ErrorCompletingRequestException
 	 */
-	public boolean executeAndProcessQuery(final String query, final RowProcessor rowProcessor)
+	public void executeAndProcessQuery(final String query, final RowProcessor rowProcessor)
 			throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException, ErrorCompletingRequestException {
-		boolean found = false;
 		try (final AS400JDBCStatement statement = getDB2Statement()) {
 			try (final ResultSet resultSet = statement.executeQuery(query)) {
 				while (resultSet.next()) {
-					found = true;
 					rowProcessor.processRow(resultSet);
 				}
 			}
 		}
-
-		return found;
 	}
 
 	public synchronized CallResult executeCommand(@CheckForNull String command)
@@ -320,8 +316,8 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	/**
 	 * Runs a {@link TempFileTask} with a temporary {@link IFSFile} whose name is guaranteed to be unique.
 	 *
-	 * @param task
-	 * @throws IOException
+	 * @param task the task to run on the temporary file
+	 * @throws IOException thrown in case of error from the task ar the temp file handling
 	 */
 	public void withTempFile(final TempFileTask task)
 			throws IOException, InterruptedException {
@@ -360,8 +356,8 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 
 	private long copy(final InputStream input, final OutputStream output) throws IOException {
 		final byte[] buffer = new byte[1048576];
-		int read = -1;
 		long bytes = 0;
+		int read;
 		while ((read = input.read(buffer)) > -1) {
 			output.write(buffer, 0, read);
 			bytes += read;

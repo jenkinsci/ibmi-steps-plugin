@@ -5,7 +5,7 @@
             <name>IBMi 1</name>
             <host>ibmi1.sebjulliand.github.com</host>
             <credentialsId>a6d5ecee-c167-4ec5-8b5e-ee39ddb5c96e</credentialsId>
-            <ccsid></ccsid>
+            <ccsid>0</ccsid>
             <secure>true</secure>
         </org.jenkinsci.plugins.ibmisteps.configuration.IBMiServerConfiguration>
 

@@ -4,8 +4,8 @@
         <f:select/>
     </f:entry>
 
-	<f:entry field="iasp" title="${%IASP}">
-        <f:textbox />
+    <f:entry field="iasp" title="${%IASP}">
+        <f:textbox/>
     </f:entry>
 
     <f:entry field="traceEnabled" title="${%EnableTrace}">

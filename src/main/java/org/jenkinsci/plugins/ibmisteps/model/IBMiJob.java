@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public record IBMiJob(String number, String user, String name) implements Serializable {
 	@Override
-	public final String toString() {
+	public String toString() {
 		return "%s/%s/%s".formatted(number, user, name);
 	}
 }

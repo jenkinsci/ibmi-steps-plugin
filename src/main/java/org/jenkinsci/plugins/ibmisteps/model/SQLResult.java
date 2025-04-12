@@ -1,29 +1,22 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 
+import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.sql.Date;
+import java.util.*;
+
 public class SQLResult implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 6196545312618433171L;
 
 	private final List<SQLColumn> columns = new LinkedList<>();
@@ -58,7 +51,7 @@ public class SQLResult implements Serializable {
 	private void loadRow(final ResultSet resultSet) throws SQLException {
 		final SQLRow row = new SQLRow();
 		for (int i = 0; i < getColumnCount(); i++) {
-			row.addCell(columns.get(i).getName(), resultSet.getObject(i + 1));
+			row.addCell(columns.get(i).name(), resultSet.getObject(i + 1));
 		}
 		rows.add(row);
 	}
@@ -86,9 +79,9 @@ public class SQLResult implements Serializable {
 	public String toCSV() throws IOException {
 		final CsvMapper csvMapper = new CsvMapper();
 		try (StringWriter sw = new StringWriter();
-				SequenceWriter sequenceWriter = csvMapper.writer().writeValues(sw)) {
+		     SequenceWriter sequenceWriter = csvMapper.writer().writeValues(sw)) {
 			// Write headers
-			sequenceWriter.write(columns.stream().map(SQLColumn::getName).toList());
+			sequenceWriter.write(columns.stream().map(SQLColumn::name).toList());
 			// Write rows
 			for (final SQLRow row : rows) {
 				sequenceWriter
@@ -103,39 +96,11 @@ public class SQLResult implements Serializable {
 		return objectMapper.writeValueAsString(rows.stream().map(SQLRow::getCells).toList());
 	}
 
-	public static class SQLColumn implements Serializable {
-		private static final long serialVersionUID = 953004951165154072L;
-
-		private final String name;
-		private final String typeName;
-		private final int size;
-		private final int scale;
-
-		public SQLColumn(final String name, final String typeName, final int size, final int scale) {
-			this.name = name;
-			this.typeName = typeName;
-			this.size = size;
-			this.scale = scale;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public String getTypeName() {
-			return typeName;
-		}
-
-		public int getSize() {
-			return size;
-		}
-
-		public int getScale() {
-			return scale;
-		}
+	public record SQLColumn(String name, String typeName, int size, int scale) implements Serializable {
 	}
 
 	public static class SQLRow implements Serializable {
+		@Serial
 		private static final long serialVersionUID = 3759165044341489985L;
 
 		private final Map<String, Object> cells = new LinkedHashMap<>();

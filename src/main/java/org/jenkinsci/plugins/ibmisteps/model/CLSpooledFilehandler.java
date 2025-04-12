@@ -1,10 +1,5 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
-import java.io.IOException;
-import java.util.UUID;
-
-import org.jenkinsci.plugins.ibmisteps.model.SpooledFiles.SpooledFile;
-
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
 import com.ibm.as400.access.IFSFile;
@@ -12,10 +7,15 @@ import com.ibm.as400.access.ObjectDoesNotExistException;
 import com.ibm.as400.access.list.OpenListException;
 import com.ibm.as400.access.list.SpooledFileListItem;
 import com.ibm.as400.access.list.SpooledFileOpenList;
-
 import hudson.FilePath;
+import org.jenkinsci.plugins.ibmisteps.model.SpooledFiles.SpooledFile;
+
+import java.io.IOException;
+import java.io.Serial;
+import java.util.UUID;
 
 public class CLSpooledFilehandler implements SpooledFileHandler {
+	@Serial
 	private static final long serialVersionUID = -2465788947902207300L;
 
 	CLSpooledFilehandler() {

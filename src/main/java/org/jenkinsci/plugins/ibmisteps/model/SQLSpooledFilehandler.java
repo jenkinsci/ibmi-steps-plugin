@@ -7,12 +7,14 @@ import hudson.FilePath;
 import org.jenkinsci.plugins.ibmisteps.model.SpooledFiles.SpooledFile;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SQLSpooledFilehandler implements SpooledFileHandler {
+	@Serial
 	private static final long serialVersionUID = -115898412769496093L;
 
 	private static final String SPOOLED_FILE_DATA = """
@@ -51,9 +53,9 @@ public class SQLSpooledFilehandler implements SpooledFileHandler {
 			ErrorCompletingRequestException {
 		final SpooledFiles spooledFiles = new SpooledFiles();
 		ibmi.executeAndProcessQuery(SPOOLED_FILE_INFO.formatted(
-				jobNumber,
-				jobUser,
-				jobName),
+						jobNumber,
+						jobUser,
+						jobName),
 				row -> spooledFiles.add(new SpooledFile(row.getString("SPOOLED_FILE_NAME"),
 						row.getInt("SPOOLED_FILE_NUMBER"),
 						row.getLong("SIZE"), row.getString("USER_DATA"),

@@ -11,8 +11,8 @@ import java.util.Set;
 
 public abstract class IBMiStepDescriptor extends StepDescriptor {
 
-    @Override
-    public Set<? extends Class<?>> getRequiredContext() {
-        return ImmutableSet.of(Run.class, TaskListener.class, FilePath.class, IBMiContext.class);
-    }
+	@Override
+	public Set<? extends Class<?>> getRequiredContext() {
+		return ImmutableSet.of(Run.class, TaskListener.class, FilePath.class, IBMiContext.class);
+	}
 }
