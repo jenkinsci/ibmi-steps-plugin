@@ -40,8 +40,7 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 	}
 
 	@Override
-	protected Void runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
-			throws Exception {
+	protected Void runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi) throws IOException, InterruptedException, AS400SecurityException {
 		final FilePath fromPath = context.get(FilePath.class).child(from);
 		if (!fromPath.exists()) {
 			throw new AbortException(Messages.IBMiPutIFSStep_from_not_found(fromPath));

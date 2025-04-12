@@ -1,5 +1,9 @@
 package org.jenkinsci.plugins.ibmisteps.steps;
 
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.ObjectDoesNotExistException;
+import com.ibm.as400.access.list.OpenListException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
@@ -14,7 +18,9 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import java.io.IOException;
 import java.io.Serial;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 
 public class IBMiGetSpooledFilesStep extends IBMiStep<SpooledFiles> {
@@ -62,8 +68,7 @@ public class IBMiGetSpooledFilesStep extends IBMiStep<SpooledFiles> {
 	}
 
 	@Override
-	protected SpooledFiles runOnIBMi(final StepContext stepContext, final LoggerWrapper logger, final IBMi ibmi)
-			throws Exception {
+	protected SpooledFiles runOnIBMi(final StepContext stepContext, final LoggerWrapper logger, final IBMi ibmi) throws AS400SecurityException, SQLException, OpenListException, ObjectDoesNotExistException, IOException, InterruptedException, ErrorCompletingRequestException {
 		logger.log(Messages.IBMiGetSpooledFiles_getting(jobNumber, jobUser, jobName));
 		final SpooledFileHandler spooledFileHandler = ibmi.getSpooledFileHandler();
 		final SpooledFiles spooledFiles = spooledFileHandler.listSpooledFiles(ibmi, jobNumber, jobUser, jobName);

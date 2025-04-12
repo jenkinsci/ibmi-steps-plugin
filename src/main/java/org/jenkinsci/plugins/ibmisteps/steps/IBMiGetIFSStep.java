@@ -40,8 +40,7 @@ public class IBMiGetIFSStep extends IBMiStep<Void> {
 	}
 
 	@Override
-	protected Void runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
-			throws Exception {
+	protected Void runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi) throws IOException, InterruptedException, AS400SecurityException {
 		final IFSFile fromIFS = new IFSFile(ibmi.getIbmiConnection(), from);
 		if (!fromIFS.exists()) {
 			throw new AbortException(Messages.IBMiGetIFSStep_from_not_found(fromIFS));

@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.ibmisteps.steps;
 
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.ObjectDoesNotExistException;
 import com.ibm.as400.access.SaveFile;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
@@ -48,8 +49,7 @@ public class IBMiGetSAVFStep extends IBMiStep<SaveFileContent> {
 	}
 
 	@Override
-	protected SaveFileContent runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
-			throws Exception {
+	protected SaveFileContent runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi) throws AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException, ErrorCompletingRequestException {
 		final SaveFile saveFile = new SaveFile(ibmi.getIbmiConnection(), library, name);
 		if (!saveFile.exists()) {
 			throw new AbortException(Messages.IBMiDownloadSAVF_save_file_not_found(library, name));

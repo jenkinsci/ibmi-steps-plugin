@@ -1,6 +1,8 @@
 package org.jenkinsci.plugins.ibmisteps.steps;
 
 import com.ibm.as400.access.AS400Message;
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.ErrorCompletingRequestException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
 import hudson.Extension;
@@ -14,6 +16,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import java.io.IOException;
 import java.io.Serial;
 
 public class IBMiCommandStep extends IBMiStep<CallResult> {
@@ -42,8 +45,7 @@ public class IBMiCommandStep extends IBMiStep<CallResult> {
 	}
 
 	@Override
-	protected CallResult runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
-			throws Exception {
+	protected CallResult runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi) throws AS400SecurityException, IOException, InterruptedException, ErrorCompletingRequestException {
 		logger.log(Messages.IBMICommandStep_running(command));
 
 		final CallResult result = ibmi.executeCommand(command);

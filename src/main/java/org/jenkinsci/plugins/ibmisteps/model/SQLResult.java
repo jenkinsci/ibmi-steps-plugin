@@ -79,7 +79,7 @@ public class SQLResult implements Serializable {
 	public String toCSV() throws IOException {
 		final CsvMapper csvMapper = new CsvMapper();
 		try (StringWriter sw = new StringWriter();
-			SequenceWriter sequenceWriter = csvMapper.writer().writeValues(sw)) {
+		     SequenceWriter sequenceWriter = csvMapper.writer().writeValues(sw)) {
 			// Write headers
 			sequenceWriter.write(columns.stream().map(SQLColumn::name).toList());
 			// Write rows

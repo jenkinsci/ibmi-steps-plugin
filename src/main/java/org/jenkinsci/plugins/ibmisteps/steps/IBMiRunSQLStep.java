@@ -1,6 +1,9 @@
 package org.jenkinsci.plugins.ibmisteps.steps;
 
 import com.ibm.as400.access.AS400JDBCStatement;
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.ObjectDoesNotExistException;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import org.jenkinsci.plugins.ibmisteps.Messages;
@@ -12,6 +15,7 @@ import org.jenkinsci.plugins.ibmisteps.steps.abstracts.IBMiStepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,8 +36,7 @@ public class IBMiRunSQLStep extends IBMiStep<SQLResult> {
 	}
 
 	@Override
-	protected SQLResult runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi)
-			throws Exception {
+	protected SQLResult runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi) throws SQLException, AS400SecurityException, ObjectDoesNotExistException, IOException, InterruptedException, ErrorCompletingRequestException {
 		logger.log(Messages.IBMiRunSQLStep_running(sql));
 
 		try (AS400JDBCStatement statement = ibmi.getDB2Statement()) {

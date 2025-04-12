@@ -1,5 +1,9 @@
 package org.jenkinsci.plugins.ibmisteps.steps.abstracts;
 
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.ObjectDoesNotExistException;
+import com.ibm.as400.access.list.OpenListException;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.ibmisteps.model.IBMi;
 import org.jenkinsci.plugins.ibmisteps.model.IBMiContext;
@@ -13,12 +17,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.sql.SQLException;
 
 public abstract class IBMiStep<T> extends Step implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 1L;
 
-	protected abstract T runOnIBMi(StepContext stepContext, LoggerWrapper logger, IBMi ibmi) throws Exception;
+	protected abstract T runOnIBMi(StepContext stepContext, LoggerWrapper logger, IBMi ibmi) throws IOException, InterruptedException, AS400SecurityException, ErrorCompletingRequestException, ObjectDoesNotExistException, SQLException, OpenListException;
 
 	@Override
 	public StepExecution start(final StepContext context) {
