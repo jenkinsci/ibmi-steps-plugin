@@ -6,6 +6,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.util.FormValidation;
 import org.jenkinsci.plugins.ibmisteps.Messages;
 import org.jenkinsci.plugins.ibmisteps.model.IBMi;
 import org.jenkinsci.plugins.ibmisteps.model.LoggerWrapper;
@@ -13,6 +14,9 @@ import org.jenkinsci.plugins.ibmisteps.steps.abstracts.IBMiStep;
 import org.jenkinsci.plugins.ibmisteps.steps.abstracts.IBMiStepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -24,6 +28,7 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 
 	private final String from;
 	private final String to;
+	private int ccsid = 1208;
 
 	@DataBoundConstructor
 	public IBMiPutIFSStep(final String from, final String to) {
@@ -37,6 +42,15 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 
 	public String getTo() {
 		return to;
+	}
+
+	public int getCcsid() {
+		return ccsid;
+	}
+
+	@DataBoundSetter
+	public void setCcsid(final int ccsid) {
+		this.ccsid = ccsid;
 	}
 
 	@Override
@@ -70,10 +84,9 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 	private void putFile(final LoggerWrapper logger, final IBMi ibmi, final FilePath file, final IFSFile ifsFolder)
 			throws IOException, AS400SecurityException, InterruptedException {
 		final IFSFile targetFile = new IFSFile(ifsFolder, file.getName());
-		if (targetFile.exists()) {
-			targetFile.delete();
+		if(ccsid > 0){
+			targetFile.setCCSID(ccsid);
 		}
-
 		logger.trace(MessageFormat.format("Putting {0} into {1} ({2} bytes)", file, targetFile, file.length()));
 		ibmi.upload(file, targetFile);
 	}
@@ -100,6 +113,23 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 		@Override
 		public String getDisplayName() {
 			return Messages.IBMiPutIFSStep_description();
+		}
+
+		@RequirePOST
+		@SuppressWarnings("lgtm[jenkins/no-permission-check]")
+		public FormValidation doCheckCcsid(@QueryParameter final Integer ccsid) {
+			if (ccsid != null) {
+				try {
+					if (ccsid < 1 || ccsid > 65535) {
+						throw new NumberFormatException();
+					} else if (ccsid == 5026) {
+						return FormValidation.error(Messages.IBMiServer_ccsid_5026_not_supported());
+					}
+				} catch (final NumberFormatException e) {
+					return FormValidation.error(Messages.IBMiServer_invalid_ccsid());
+				}
+			}
+			return FormValidation.ok();
 		}
 	}
 }
