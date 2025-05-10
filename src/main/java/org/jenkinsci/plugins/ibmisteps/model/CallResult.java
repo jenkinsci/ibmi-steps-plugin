@@ -7,11 +7,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CallResult implements Serializable {
 	@Serial
@@ -19,27 +19,27 @@ public class CallResult implements Serializable {
 
 	private static final Pattern JOB_PATTERN = Pattern.compile(" (\\d{1,6})/([^/ ]{1,10})/([^/ ]{1,10}) ");
 
-	private final List<AS400Message> messages = new ArrayList<>();
+	private final List<IBMiMessage> messages = new ArrayList<>();
 	private final boolean successful;
 
-	public CallResult(final boolean successful, final AS400Message[] ibmiMessages) {
+	public CallResult(final IBMi ibmi, final boolean successful, final AS400Message[] as400Messages) {
 		this.successful = successful;
-		Collections.addAll(messages, ibmiMessages);
+		Stream.of(as400Messages).map(message -> new IBMiMessage(ibmi, message)).forEach(messages::add);
 	}
 
-	public AS400Message getMessage(final String messageId) {
+	public IBMiMessage getMessage(final String messageId) {
 		return messages.stream() //
 				.filter(m -> m.getID().equalsIgnoreCase(messageId))//
 				.findFirst() //
 				.orElse(null);
 	}
 
-	public List<AS400Message> getMessages() {
+	public List<IBMiMessage> getMessages() {
 		return messages;
 	}
 
 	@CheckForNull
-	public AS400Message getLastMessage() {
+	public IBMiMessage getLastMessage() {
 		return messages.isEmpty() ? null : messages.get(messages.size() - 1);
 	}
 
