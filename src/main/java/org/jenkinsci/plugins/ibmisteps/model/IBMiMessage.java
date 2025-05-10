@@ -3,12 +3,16 @@ package org.jenkinsci.plugins.ibmisteps.model;
 import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.MessageFile;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Supplier;
 
 public class IBMiMessage implements Serializable {
+	@Serial
+	private static final long serialVersionUID = 4119612591789660630L;
+
 	private final AS400Message as400Message;
 	private final transient Supplier<String> substitutionDataRetriever;
 
