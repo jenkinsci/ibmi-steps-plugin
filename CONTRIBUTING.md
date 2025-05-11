@@ -2,7 +2,7 @@
 
 ## Building
 ### Prerequisites
-- Java 64 bits JDK 17 or 21 ([Adoptium's JDK](https://adoptium.net/fr/temurin/releases/?arch=x64&package=jdk&version=21) are a good option)
+- Java 64 bits JDK 17 or 21 ([Adoptium's JDK](https://adoptium.net/temurin/releases/?arch=x64&package=jdk&version=21) are a good option)
 - [Apache Maven](https://maven.apache.org/install.html)
 - Clone the repository
 
