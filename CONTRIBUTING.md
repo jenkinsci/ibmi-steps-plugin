@@ -21,7 +21,7 @@ mvn hpi:run
 
 To specify the HTTP port, run:
 ````shell
-mvn hpi:run -Djetty.port=PORT
+mvn hpi:run -Dport=PORT
 ````
 
 ### Debugging
