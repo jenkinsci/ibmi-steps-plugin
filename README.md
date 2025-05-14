@@ -357,7 +357,7 @@ if(result.successful) {
 | getSubmittedJobs()             | [`List`](https://docs.oracle.com/javase/8/docs/api/java/util/List.html)<[IBMiJob](#ibmijob)>                                                                                     | Returns a list of [IBMiJob](#ibmijob) found by browsing the `CPC1221` messages from the call result.                                                                                            |
 
 ### IBMiMessage
-Every getters from [AS400Message](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/AS400Message.html) plus the method(s) below.
+Extends [AS400Message](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/AS400Message.html) and adds the method(s) below.
 | Methods               | Return type | Description                                                                                                                                                                         |
 |:----------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | getSubstitutionDataAsString() | `String`    | The AS400 message substitution data converted using current connection's [CharConverter](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/CharConverter.html). |
