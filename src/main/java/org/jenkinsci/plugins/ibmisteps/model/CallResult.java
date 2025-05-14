@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
 import com.ibm.as400.access.AS400Message;
+import com.ibm.as400.access.IBMiMessage;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 import java.io.Serial;
