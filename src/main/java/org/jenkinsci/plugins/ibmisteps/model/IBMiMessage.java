@@ -113,7 +113,11 @@ public class IBMiMessage implements Serializable {
 		return as400Message.getAlertOption();
 	}
 
-	public String getSubstitutionData() {
+	public byte[] getSubstitutionData() {
+		return as400Message.getSubstitutionData();
+	}
+
+	public String getSubstitutionDataAsString() {
 		return substitutionDataRetriever != null ? substitutionDataRetriever.get() : "";
 	}
 }
