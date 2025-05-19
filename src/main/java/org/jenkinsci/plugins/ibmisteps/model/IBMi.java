@@ -277,7 +277,6 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	/**
 	 * @param query        a SQL query
 	 * @param rowProcessor a processor that will run a process on each row
-	 *
 	 * @throws SQLException
 	 * @throws AS400SecurityException
 	 * @throws ObjectDoesNotExistException
@@ -302,7 +301,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 		final CommandCall commandCall = new CommandCall(ibmiConnection, command);
 		commandCall.setMessageOption(AS400Message.MESSAGE_OPTION_ALL);
 		final boolean executionOK = commandCall.run();
-		return new CallResult(executionOK, commandCall.getMessageList());
+		return new CallResult(this, executionOK, commandCall.getMessageList());
 	}
 
 	public String getOSVersion() throws AS400SecurityException, IOException {
