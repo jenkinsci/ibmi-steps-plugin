@@ -75,7 +75,7 @@
 			<groupId>net.sf.jt400</groupId>
 			<artifactId>jt400</artifactId>
 			<classifier>java11</classifier>
-			<version>21.0.4</version>
+			<version>21.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jenkins-ci.plugins.workflow</groupId>
