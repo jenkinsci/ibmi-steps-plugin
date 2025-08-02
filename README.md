@@ -104,10 +104,10 @@ Runs a CL command and returns a `CallResult` object.
 
 #### Parameters
 
-| Name        | Required | Type      | Description           |
-|:------------|:---------|:----------|:----------------------|
-| command     | ☑        | `String`  | The CL command to run |
-| failOnError | ✖        | `boolean` | v                     |
+| Name        | Required | Type      | Description                                                                                                   |
+|:------------|:---------|:----------|:--------------------------------------------------------------------------------------------------------------|
+| command     | ☑        | `String`  | The CL command to run                                                                                         |
+| failOnError | ✖        | `boolean` | When `false`, the pipeline execution won't be stopped if the command execution has fails. Defaults to `true`. |
 
 #### Returned value
 
@@ -255,10 +255,11 @@ Uploads a local file or folder and puts it in a remote IFS folder. The remote IF
 
 #### Parameters
 
-| Name | Required | Type     | Description                                                                     |
-|:-----|:---------|:---------|:--------------------------------------------------------------------------------|
-| from | ☑        | `String` | The local path of the folder or file to upload.                                 |
-| to   | ☑        | `String` | The remote IFS path of the folder where the `from` IFS target will be uploaded. |
+| Name  | Required | Type     | Description                                                                                     |
+|:------|:---------|:---------|:------------------------------------------------------------------------------------------------|
+| from  | ☑        | `String` | The local path of the folder or file to upload.                                                 |
+| to    | ☑        | `String` | The remote IFS path of the folder where the `from` IFS target will be uploaded.                 |
+| ccsid | ☑        | `int`    | The CCSID to set on each IFS file created during the step execution; defaults to `1208` (utf-8) |
 
 #### Returned value
 
