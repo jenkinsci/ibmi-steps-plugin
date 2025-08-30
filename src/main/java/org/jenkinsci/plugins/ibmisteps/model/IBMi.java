@@ -1,15 +1,14 @@
 package org.jenkinsci.plugins.ibmisteps.model;
 
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.ibm.as400.access.*;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import hudson.FilePath;
-import hudson.Util;
-import hudson.util.Secret;
-import org.jenkinsci.plugins.ibmisteps.Messages;
-
 import java.beans.PropertyVetoException;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +17,32 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+
+import org.jenkinsci.plugins.ibmisteps.Messages;
+
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.AS400JDBCConnection;
+import com.ibm.as400.access.AS400JDBCDriver;
+import com.ibm.as400.access.AS400JDBCStatement;
+import com.ibm.as400.access.AS400Message;
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.CharConverter;
+import com.ibm.as400.access.CommandCall;
+import com.ibm.as400.access.ConnectionEvent;
+import com.ibm.as400.access.ConnectionListener;
+import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.IFSFile;
+import com.ibm.as400.access.IFSFileInputStream;
+import com.ibm.as400.access.IFSFileOutputStream;
+import com.ibm.as400.access.Job;
+import com.ibm.as400.access.ObjectDoesNotExistException;
+import com.ibm.as400.access.SecureAS400;
+
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import hudson.FilePath;
+import hudson.Util;
+import hudson.util.Secret;
 
 public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	public static final String SYSBAS = "*SYSBAS";
@@ -40,7 +65,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	private SpooledFileHandler spooledFileHandler;
 
 	public IBMi(final PrintStream stream, final String host, final StandardUsernamePasswordCredentials credentials,
-	            final int ccsid, final boolean secure, final boolean doTrace) throws IOException, InterruptedException {
+			final int ccsid, final boolean secure, final boolean doTrace) throws IOException, InterruptedException {
 		logger = new LoggerWrapper(stream, doTrace);
 		ibmiConnection = secure ? new SecureAS400() : new AS400();
 		try {
@@ -111,7 +136,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 
 		if (!isSYSBAS(iASP)) {
 			try (final Connection connection = new AS400JDBCDriver().connect(ibmiConnection);
-			     final Statement statement = connection.createStatement()) {
+					final Statement statement = connection.createStatement()) {
 				try (final ResultSet resultSet = statement.executeQuery(String.format(
 						"Select RDB_NAME From QSYS2.ASP_INFO Where DEVICE_DESCRIPTION_NAME = '%s' Fetch First row only",
 						iASP))) {
@@ -275,8 +300,10 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	}
 
 	/**
-	 * @param query        a SQL query
-	 * @param rowProcessor a processor that will run a process on each row
+	 * @param query
+	 *            a SQL query
+	 * @param rowProcessor
+	 *            a processor that will run a process on each row
 	 * @throws SQLException
 	 * @throws AS400SecurityException
 	 * @throws ObjectDoesNotExistException
@@ -315,8 +342,10 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	/**
 	 * Runs a {@link TempFileTask} with a temporary {@link IFSFile} whose name is guaranteed to be unique.
 	 *
-	 * @param task the task to run on the temporary file
-	 * @throws IOException thrown in case of error from the task ar the temp file handling
+	 * @param task
+	 *            the task to run on the temporary file
+	 * @throws IOException
+	 *             thrown in case of error from the task ar the temp file handling
 	 */
 	public void withTempFile(final TempFileTask task)
 			throws IOException, InterruptedException {
@@ -337,18 +366,23 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 	public long download(final IFSFile from, final FilePath to)
 			throws IOException, AS400SecurityException, InterruptedException {
 		try (InputStream input = new BufferedInputStream(new IFSFileInputStream(from));
-		     OutputStream output = new BufferedOutputStream(to.write())) {
+				OutputStream output = new BufferedOutputStream(to.write())) {
 			return copy(input, output);
 		}
 	}
 
 	public long upload(final FilePath from, final IFSFile to)
 			throws IOException, AS400SecurityException, InterruptedException {
+		return upload(from, to, -1);
+	}
+
+	public long upload(final FilePath from, final IFSFile to, final int ccsid)
+			throws IOException, AS400SecurityException, InterruptedException {
 		if (to.getParentFile() != null) {
 			to.getParentFile().mkdirs();
 		}
 		try (InputStream input = new BufferedInputStream(from.read());
-		     OutputStream output = new BufferedOutputStream(new IFSFileOutputStream(to))) {
+				OutputStream output = new BufferedOutputStream(ccsid > -1 ? new IFSFileOutputStream(to, IFSFileOutputStream.SHARE_ALL, false, ccsid) : new IFSFileOutputStream(to))) {
 			return copy(input, output);
 		}
 	}
@@ -374,8 +408,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 				logger.log(Messages.IBMi_failed_sql_service_check(e.getLocalizedMessage()));
-			} catch (SQLException | AS400SecurityException | ObjectDoesNotExistException | IOException |
-			         ErrorCompletingRequestException e) {
+			} catch (SQLException | AS400SecurityException | ObjectDoesNotExistException | IOException | ErrorCompletingRequestException e) {
 				logger.log(Messages.IBMi_failed_sql_service_check(e.getLocalizedMessage()));
 			}
 
