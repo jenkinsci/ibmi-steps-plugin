@@ -1,8 +1,8 @@
 package org.jenkinsci.plugins.ibmisteps.steps;
 
-import com.ibm.as400.access.AS400Message;
 import com.ibm.as400.access.AS400SecurityException;
 import com.ibm.as400.access.ErrorCompletingRequestException;
+import com.ibm.as400.access.IBMiMessage;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
 import hudson.Extension;
@@ -49,7 +49,7 @@ public class IBMiCommandStep extends IBMiStep<CallResult> {
 		logger.log(Messages.IBMICommandStep_running(command));
 
 		final CallResult result = ibmi.executeCommand(command);
-		final AS400Message lastMessage = result.getLastMessage();
+		final IBMiMessage lastMessage = result.getLastMessage();
 		if (result.isSuccessful()) {
 			logger.log(Messages.IBMICommandStep_succeeded(command));
 		} else {

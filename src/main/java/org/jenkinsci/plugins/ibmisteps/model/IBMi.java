@@ -328,7 +328,7 @@ public class IBMi implements ConnectionListener, AutoCloseable, Serializable {
 		final CommandCall commandCall = new CommandCall(ibmiConnection, command);
 		commandCall.setMessageOption(AS400Message.MESSAGE_OPTION_ALL);
 		final boolean executionOK = commandCall.run();
-		return new CallResult(executionOK, commandCall.getMessageList());
+		return new CallResult(this, executionOK, commandCall.getMessageList());
 	}
 
 	public String getOSVersion() throws AS400SecurityException, IOException {
