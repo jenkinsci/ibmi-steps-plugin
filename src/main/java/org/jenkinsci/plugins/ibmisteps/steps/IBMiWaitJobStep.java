@@ -118,6 +118,8 @@ public class IBMiWaitJobStep extends IBMiStep<Job> {
 				while (isJobInMSGW(job)) {
 					Thread.sleep(500);
 				}
+				logger.log(Messages.IBMiWaitJob_MSGW_resume());
+				return true;
 			}
 
 			case RESUME -> {
