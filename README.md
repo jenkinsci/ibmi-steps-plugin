@@ -6,35 +6,35 @@ Jenkins plugin providing IBM i pipeline steps such as command execution, Db2 que
 IFS transfers.
 
 ----
-
 - [Configuration](#configuration)
 - [Steps](#steps)
-  - [onIBMi](#onibmi)
-  - [ibmiCommand](#ibmicommand)
-  - [ibmiRunSQL](#ibmirunsql)
-  - [ibmiGetSAVF](#ibmigetsavf)
-  - [ibmiPutSAVF](#ibmiputsavf)
-  - [ibmiGetIFS](#ibmigetifs)
-  - [ibmiPutIFS](#ibmiputifs)
-  - [ibmiGetSPLF](#ibmigetsplf)
-  - [ibmiWaitJob](#ibmiwaitjob)
+    - [onIBMi](#onibmi)
+    - [ibmiCommand](#ibmicommand)
+    - [ibmiShellExec](#ibmishellexec)
+    - [ibmiRunSQL](#ibmirunsql)
+    - [ibmiGetSAVF](#ibmigetsavf)
+    - [ibmiPutSAVF](#ibmiputsavf)
+    - [ibmiGetIFS](#ibmigetifs)
+    - [ibmiPutIFS](#ibmiputifs)
+    - [ibmiGetSPLF](#ibmigetsplf)
+    - [ibmiWaitJob](#ibmiwaitjob)
 - [Enumerations](#enumerations)
-  - [OnMSGW](#onmsgw)
+    - [OnMSGW](#onmsgw)
 - [Returned objects](#returned-objects)
-  - [CallResult](#callresult)
-  - [IBMiMessage](#ibmimessage)
-  - [IBMiJob](#ibmijob)
-  - [SQLResult](#sqlresult)
-  - [SQLColumn](#sqlcolumn)
-  - [SQLRow](#sqlrow)
-  - [SaveFileContent](#savefilecontent)
-  - [SAVFEntry](#savfentry)
-  - [SpooledFiles](#spooledfiles)
-  - [SpooledFile](#spooledfile)
+    - [CallResult](#callresult)
+    - [IBMiMessage](#ibmimessage)
+    - [IBMiJob](#ibmijob)
+    - [SQLResult](#sqlresult)
+    - [SQLColumn](#sqlcolumn)
+    - [SQLRow](#sqlrow)
+    - [SaveFileContent](#savefilecontent)
+    - [SAVFEntry](#savfentry)
+    - [SpooledFiles](#spooledfiles)
+    - [SpooledFile](#spooledfile)
 - [Examples](#examples)
-  - [Save a library, download the Save File and archive its content description](#save-a-library-download-the-save-file-and-archive-its-content-description)
-  - [Transfer a libray from one LPAR to another](#transfer-a-libray-from-one-lpar-to-another)
-  - [Submit a job and download the spooled files it generated](#submit-a-job-and-download-the-spooled-files-it-generated)
+    - [Save a library, download the Save File and archive its content description](#save-a-library-download-the-save-file-and-archive-its-content-description)
+    - [Transfer a libray from one LPAR to another](#transfer-a-libray-from-one-lpar-to-another)
+    - [Submit a job and download the spooled files it generated](#submit-a-job-and-download-the-spooled-files-it-generated)
 
 ## Configuration
 
@@ -61,13 +61,13 @@ related resources are freed and the `IBMI_` environment variables are removed.
 
 This steps loads the following environment variables during its execution. These variables are accessible through the
 `env` object (e.g. `env.IBMI_PROFILE`).
-| Name             | Description                                                |
+| Name | Description |
 |:-----------------|:-----------------------------------------------------------|
-| IBMI_HOST        | The connected IBM i hostname                               |
-| IBMI_PROFILE     | The user profile used to connect to the IBM i              |
-| IBMI_CCSID       | The current CCSID                                          |
+| IBMI_HOST | The connected IBM i hostname |
+| IBMI_PROFILE | The user profile used to connect to the IBM i |
+| IBMI_CCSID | The current CCSID |
 | IBMI_COMMAND_JOB | The IBM i command job identifier (i.e. `number/user/name`) |
-| IBMI_VERSION     | The OS version of the IBM i (i.e. `version.release`)       |
+| IBMI_VERSION | The OS version of the IBM i (i.e. `version.release`)       |
 
 #### Parameters
 
@@ -105,10 +105,10 @@ Runs a CL command and returns a `CallResult` object.
 
 #### Parameters
 
-| Name        | Required | Type      | Description                                                                                                   |
-|:------------|:---------|:----------|:--------------------------------------------------------------------------------------------------------------|
-| command     | ☑        | `String`  | The CL command to run                                                                                         |
-| failOnError | ✖        | `boolean` | When `false`, the pipeline execution won't be stopped if the command execution has fails. Defaults to `true`. |
+| Name        | Required | Type      | Description                                                                                                    |
+|:------------|:---------|:----------|:---------------------------------------------------------------------------------------------------------------|
+| command     | ☑        | `String`  | The CL command to run                                                                                          |
+| failOnError | ✖        | `boolean` | When `false`, the pipeline execution won't be stopped if the command execution has failed. Defaults to `true`. |
 
 #### Returned value
 
@@ -134,7 +134,35 @@ if (!result.successful) {
 
 //Delete a library; carry on whatever happens
 ibmiCommand(command: "DLTLIB LIB($library)", failOnError: false)
+```
 
+### ibmiShellExec
+
+Runs a shell command through `QSH` and returns a `ShellExec` object.
+
+#### Parameters
+
+| Name        | Required | Type      | Description                                                                                                  |
+|:------------|:---------|:----------|:-------------------------------------------------------------------------------------------------------------|
+| command     | ☑        | `String`  | The shell command to run                                                                                     |
+| failOnError | ✖        | `boolean` | When `false`, the pipeline execution won't be stopped if the shell execution has failed. Defaults to `true`. |
+
+#### Returned value
+
+A [`ShellExec`](#shellexec) object.
+
+#### Example
+
+```groovy
+//List and print all the file in /tmp
+def tempList = ibmiShellExec "ls /tmp"
+print tempList.output
+
+//Copy something but do not stop if it fails 
+def result = ibmiShellExec(command: "cp /something", failOnError: false)
+if (result.code != 0) {
+    print "Copy failed but we carry on!"
+}
 ```
 
 ### ibmiRunSQL
@@ -326,9 +354,9 @@ A [`Job`](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/
 
 ```groovy
 def result = ibmiCommand "SBMJOB CMD(COMPILE...)"
-if(result.successful) {
+if (result.successful) {
     def job = result.getSubmittedJobs().getAt(0)
-    if(job){
+    if (job) {
         //Wait for the job and fail pipeline if it hits MSGW status
         ibmiWaitJob name: job.name, number: job.number, user: job.user, onMSGW: 'FAIL'
     }
@@ -338,6 +366,7 @@ if(result.successful) {
 ## Enumerations
 
 ### OnMSGW
+
 | Value  | Description                                          |
 |:-------|:-----------------------------------------------------|
 | FAIL   | Stop the pipeline execution and marks it as failed.  |
@@ -348,20 +377,31 @@ if(result.successful) {
 ## Returned objects
 
 ### CallResult
-| Methods                        | Return type                                                                                                                                                                      | Description                                                                                                                                                                                     |
-|:-------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| getMessages()                  | [`List`](https://docs.oracle.com/javase/8/docs/api/java/util/List.html)<[IBMiMessage](#ibmimessage)> | Returns the list of [IBMiMessage](#ibmimessage) generated during the command execution.                             |
-| getMessage(`String` messageId) | [IBMiMessage](#ibmimessage)                                                                          | Look for the first [IBMiMessage](#ibmimessage) whose ID is `messageId` and returns it. Returns `null` if not found. |
-| getLastMessage()               | [IBMiMessage](#ibmimessage)                                                                          | Returns the last [IBMiMessage](#ibmimessage) generated by the command or `null` if there is no message.             |
-| getPrettyMessages()            | `String`                                                                                                                                                                         | Returns a `String` resulting from the concatenation of every [IBMiMessage](#ibmimessage) returned by the command, one per line, formatted using this pattern: `[{id}][{severity}] {text}`.      |
-| isSuccessful()                 | `boolean`                                                                                                                                                                        | Returns `true ` if the command execution was successful, `false` otherwise.                                                                                                                     |
-| getSubmittedJobs()             | [`List`](https://docs.oracle.com/javase/8/docs/api/java/util/List.html)<[IBMiJob](#ibmijob)>                                                                                     | Returns a list of [IBMiJob](#ibmijob) found by browsing the `CPC1221` messages from the call result.                                                                                            |
+
+| Methods                        | Return type                                                                                          | Description                                                                                                                                                                                |
+|:-------------------------------|:-----------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| getMessages()                  | [`List`](https://docs.oracle.com/javase/8/docs/api/java/util/List.html)<[IBMiMessage](#ibmimessage)> | Returns the list of [IBMiMessage](#ibmimessage) generated during the command execution.                                                                                                    |
+| getMessage(`String` messageId) | [IBMiMessage](#ibmimessage)                                                                          | Look for the first [IBMiMessage](#ibmimessage) whose ID is `messageId` and returns it. Returns `null` if not found.                                                                        |
+| getLastMessage()               | [IBMiMessage](#ibmimessage)                                                                          | Returns the last [IBMiMessage](#ibmimessage) generated by the command or `null` if there is no message.                                                                                    |
+| getPrettyMessages()            | `String`                                                                                             | Returns a `String` resulting from the concatenation of every [IBMiMessage](#ibmimessage) returned by the command, one per line, formatted using this pattern: `[{id}][{severity}] {text}`. |
+| isSuccessful()                 | `boolean`                                                                                            | Returns `true ` if the command execution was successful, `false` otherwise.                                                                                                                |
+| getSubmittedJobs()             | [`List`](https://docs.oracle.com/javase/8/docs/api/java/util/List.html)<[IBMiJob](#ibmijob)>         | Returns a list of [IBMiJob](#ibmijob) found by browsing the `CPC1221` messages from the call result.                                                                                       |
+
+### ShellExec
+
+| Methods  | Return type | Description                                  |
+|:---------|:------------|:---------------------------------------------|
+| code()   | `int`       | The exit code returned by the shell command. |
+| output() | `String`    | The output produced by the shell command.    |
 
 ### IBMiMessage
-Extends [AS400Message](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/AS400Message.html) and adds the method(s) below.
-| Methods               | Return type | Description                                                                                                                                                                         |
+
+Extends [AS400Message](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/AS400Message.html) and adds
+the method(s) below.
+| Methods | Return type | Description |
 |:----------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| getSubstitutionDataAsString() | `String`    | The AS400 message substitution data converted using current connection's [CharConverter](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/CharConverter.html). |
+| getSubstitutionDataAsString() | `String`    | The AS400 message substitution data converted using current
+connection's [CharConverter](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/as400/access/CharConverter.html). |
 
 ### IBMiJob
 
@@ -385,12 +425,12 @@ Extends [AS400Message](https://javadoc.io/doc/net.sf.jt400/jt400/latest/com/ibm/
 
 ### SQLColumn
 
-| Methods       | Return type | Description                                                                                                         |
-|:--------------|:------------|:--------------------------------------------------------------------------------------------------------------------|
-| getName()     | `String`    | The column's name.                                                                                                  |
-| getTypeName() | `String`    | The columns's database-specific type. name.                                                                         |
-| getSize()     | `int`       | The column's size.                                                                                                  |
-| getScale()    | `int`       | The number of digits to right of the decimal point. 0 is returned for data types where the scale is not applicable. |
+| Methods    | Return type | Description                                                                                                         |
+|:-----------|:------------|:--------------------------------------------------------------------------------------------------------------------|
+| name()     | `String`    | The column's name.                                                                                                  |
+| typeName() | `String`    | The columns's database-specific type. name.                                                                         |
+| size()     | `int`       | The column's size.                                                                                                  |
+| scale()    | `int`       | The number of digits to right of the decimal point. 0 is returned for data types where the scale is not applicable. |
 
 ### SQLRow
 
