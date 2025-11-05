@@ -1,9 +1,12 @@
 package org.jenkinsci.plugins.ibmisteps.steps;
 
-import java.io.IOException;
-import java.io.Serial;
-import java.text.MessageFormat;
-
+import com.ibm.as400.access.AS400SecurityException;
+import com.ibm.as400.access.IFSFile;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.AbortException;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.util.FormValidation;
 import org.jenkinsci.plugins.ibmisteps.Messages;
 import org.jenkinsci.plugins.ibmisteps.model.IBMi;
 import org.jenkinsci.plugins.ibmisteps.model.LoggerWrapper;
@@ -15,14 +18,9 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
-import com.ibm.as400.access.AS400SecurityException;
-import com.ibm.as400.access.IFSFile;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.AbortException;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.util.FormValidation;
+import java.io.IOException;
+import java.io.Serial;
+import java.text.MessageFormat;
 
 public class IBMiPutIFSStep extends IBMiStep<Void> {
 	@Serial
@@ -91,7 +89,7 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 	}
 
 	private void putFolder(final LoggerWrapper logger, final IBMi ibmi, final FilePath folder,
-			final IFSFile ifsFolder) throws IOException, InterruptedException, AS400SecurityException {
+	                       final IFSFile ifsFolder) throws IOException, InterruptedException, AS400SecurityException {
 		for (final FilePath item : folder.list()) {
 			if (item.isDirectory()) {
 				putFolder(logger, ibmi, item, new IFSFile(ifsFolder, item.getName()));
