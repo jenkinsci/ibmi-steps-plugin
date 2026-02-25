@@ -284,11 +284,12 @@ Uploads a local file or folder and puts it in a remote IFS folder. The remote IF
 
 #### Parameters
 
-| Name  | Required | Type     | Description                                                                                     |
-|:------|:---------|:---------|:------------------------------------------------------------------------------------------------|
-| from  | ☑        | `String` | The local path of the folder or file to upload.                                                 |
-| to    | ☑        | `String` | The remote IFS path of the folder where the `from` IFS target will be uploaded.                 |
-| ccsid | ☑        | `int`    | The CCSID to set on each IFS file created during the step execution; defaults to `1208` (utf-8) |
+| Name    | Required | Type     | Description                                                                                                     |
+|:--------|:---------|:---------|:----------------------------------------------------------------------------------------------------------------|
+| from    | ☑        | `String` | The local path of the folder or file to upload.                                                                 |
+| to      | ☑        | `String` | The remote IFS path of the folder where the `from` IFS target will be uploaded.                                 |
+| ccsid   | ☑        | `int`    | The CCSID to set on each IFS file created during the step execution; defaults to `1208` (utf-8)                 |
+| baseDir | ✖        | `String` | The root of the `from` path that will be subtracted during the copy. The remaing part of the path will be kept. |
 
 #### Returned value
 
@@ -299,6 +300,12 @@ None
 ```groovy
 //Put a single local file into the remote /tmp/toBeDeleted IFS folder
 ibmiPutIFS(from: "jail/slimer.png", to: "/tmp/toBeDeleted")
+
+//Put a single local file into the remote /tmp/toBeDeleted/jail IFS folder
+ibmiPutIFS(from: "/hq/jail/slimer.png", to: "/tmp/toBeDeleted", baseDir: "/hq")
+
+//Same as above but with a relative path
+ibmiPutIFS(from: "jail/slimer.png", to: "/tmp/toBeDeleted", root: ".")
 
 //Put a local folder into the /home/pvenkman folder (resulting path is /home/pvenkman/tests
 ibmiPutIFS(from: "tests", to: "/home/pvenkman")
