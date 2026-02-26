@@ -29,6 +29,7 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 	private final String from;
 	private final String to;
 	private int ccsid = 1208;
+	private String baseDir;
 
 	@DataBoundConstructor
 	public IBMiPutIFSStep(final String from, final String to) {
@@ -48,19 +49,28 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 		return ccsid;
 	}
 
+	public String getBaseDir() {
+		return baseDir;
+	}
+
 	@DataBoundSetter
 	public void setCcsid(final int ccsid) {
 		this.ccsid = ccsid;
 	}
 
+	@DataBoundSetter
+	public void setBaseDir(final String baseDir) {
+		this.baseDir = baseDir;
+	}
+
 	@Override
 	protected Void runOnIBMi(final StepContext context, final LoggerWrapper logger, final IBMi ibmi) throws IOException, InterruptedException, AS400SecurityException {
-		final FilePath fromPath = context.get(FilePath.class).child(from);
+		final FilePath fromPath = context.get(FilePath.class).child(from).absolutize();
 		if (!fromPath.exists()) {
 			throw new AbortException(Messages.IBMiPutIFSStep_from_not_found(fromPath));
 		}
 
-		final IFSFile toFolder = new IFSFile(ibmi.getIbmiConnection(), to);
+		final IFSFile toFolder = getToFolder(context, ibmi, fromPath);
 		if (!toFolder.exists()) {
 			toFolder.mkdirs();
 			if (!toFolder.exists()) {
@@ -79,6 +89,20 @@ public class IBMiPutIFSStep extends IBMiStep<Void> {
 		}
 
 		return null;
+	}
+
+	private IFSFile getToFolder(final StepContext context, final IBMi ibmi, final FilePath fromPath) throws IOException, InterruptedException {
+		if(baseDir != null && !baseDir.isEmpty()) {
+			final String rootPath = context.get(FilePath.class).child(baseDir).absolutize().getRemote();
+			if(fromPath.getRemote().startsWith(rootPath)){
+				//Make sure the target path won't start with a separator
+				int rootPathLength = rootPath.length() + (rootPath.endsWith("/") || rootPath.endsWith("\\") ? 0 : 1);
+				return new IFSFile(ibmi.getIbmiConnection(), to, fromPath.getRemote().substring(rootPathLength));
+			} else {
+				throw new AbortException(Messages.IBMiPutIFSStep_base_dir_not_parent(rootPath, fromPath));
+			}
+		}
+		return new IFSFile(ibmi.getIbmiConnection(), to);
 	}
 
 	private void putFile(final LoggerWrapper logger, final IBMi ibmi, final FilePath file, final IFSFile ifsFolder)
