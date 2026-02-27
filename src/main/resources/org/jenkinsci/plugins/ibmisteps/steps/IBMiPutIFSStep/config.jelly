@@ -8,6 +8,10 @@
         <f:textbox/>
     </f:entry>
 
+    <f:entry title="${%BaseDir}" field="baseDir" description="${%BaseDirDescription}">
+        <f:textbox/>
+    </f:entry>
+
     <f:entry title="${%CCSID}" field="ccsid">
         <f:number clazz="positive-number" min="1" max="65535" default="1208"/>
     </f:entry>
